@@ -227,9 +227,10 @@ h1{
   overflow-x:auto;scrollbar-width:thin;padding-bottom:8px;
 }
 .station{flex:1 1 0;min-width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;cursor:pointer}
-.station--end{cursor:default}
-.station:not(.station--end):hover .station__dot{border-color:var(--accent);filter:none;opacity:1}
-.station:not(.station--end):hover .station__label{color:var(--ink)}
+/* 마지막 「도착」 역도 누를 수 있다. 예전에는 cursor:default 로 막아 두었는데,
+   흐려진 모습이 「눌리지 않는 버튼」으로 보여서 눌러도 되는 것으로 바꿨다. */
+.station:hover .station__dot{border-color:var(--accent);filter:none;opacity:1}
+.station:hover .station__label{color:var(--ink)}
 .station__dot{
   width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
   background:var(--surface);border:2px solid var(--line-2);
@@ -1409,8 +1410,24 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
     L.el.stations.addEventListener('click', function(ev){
       var li = ev.target.closest('.station'); if(!li) return;
       var idx = Number(li.dataset.i);
-      if(idx >= L.steps.length) return;
+      if(idx > L.steps.length) return;
       setPlaying(false);
+
+      // 맨 끝 「도착」 역: 끝까지 건너뛴다 (도착 카드 · 도장 · 전 과정 시간)
+      if(idx === L.steps.length){
+        var rEnd = run[L.key];
+        rEnd.t = simTotal(L);
+        rEnd.i = L.steps.length - 1; rEnd.p = 1; rEnd.done = true;
+        rEnd.lastIdx = -1;                  // 도착 카드를 다시 그리게 한다
+        L.el.stamp.classList.remove('show');
+        renderLane(L);
+        // 전자 우편만 먼저 도착한 경우, 기다림 안내의 숫자도 채워 준다
+        if(run.digital.done && !run.analog.done){
+          D.el.count.textContent = comma(Math.floor(run.analog.elapsed / D.totalReal));
+        }
+        return;
+      }
+
       var r = run[L.key], acc = 0;
       for(var i=0;i<idx;i++) acc += simDur(L,i);
       r.t = acc + 0.0001; r.done = false;
