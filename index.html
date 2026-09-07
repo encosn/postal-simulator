@@ -36,6 +36,9 @@ img{max-width:100%}
   --net:#1E6BE6;
   --net-soft:#E2EBFC;
   --signal:#00A48F;
+  /* 강조(<b>) 전용 색. 종이 편지(빨강)·전자 우편(파랑) 어느 쪽과도 겹치지 않게
+     초록 계열로 골랐다. 밝은 바탕에서 명암비 4.7:1 로 본문 글자로 써도 읽힌다. */
+  --em:#0F7A6C;
 
   --f-ui:'IBM Plex Sans KR','Malgun Gothic','맑은 고딕',system-ui,-apple-system,sans-serif;
   --f-hand:'Nanum Pen Script','Malgun Gothic','맑은 고딕',cursive;
@@ -61,6 +64,7 @@ img{max-width:100%}
     --net:#74AAFF;
     --net-soft:#17263D;
     --signal:#2FD9C0;
+    --em:#2FD9C0;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -16px rgba(0,0,0,.8);
   }
 }
@@ -79,6 +83,7 @@ img{max-width:100%}
   --net:#74AAFF;
   --net-soft:#17263D;
   --signal:#2FD9C0;
+  --em:#2FD9C0;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -16px rgba(0,0,0,.8);
 }
 
@@ -111,7 +116,7 @@ h1{
    넓은 화면에서 왼쪽으로 치우쳐 보였다. 문장마다 한 줄씩 끊어 읽게 span 을 블록으로 둔다. */
 .lead{margin:0;color:var(--ink-2);font-size:clamp(15px,1.6vw,17.5px)}
 .lead > span{display:block;word-break:keep-all}
-.lead b{color:var(--ink);font-weight:600}
+.lead b{color:var(--em);font-weight:600}
 
 /* ── controls ───────────────────────────────────────────── */
 .console{
@@ -356,7 +361,7 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
 }
 .verdict p{margin:0;font-size:16px;color:var(--ink-2);word-break:keep-all;max-width:66ch}
 .verdict p+p{margin-top:10px}
-.verdict b{color:var(--ink);font-weight:600}
+.verdict b{color:var(--em);font-weight:600}
 
 /* ── think ──────────────────────────────────────────────── */
 .think{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:14px}
@@ -367,6 +372,25 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
   display:grid;place-items:center;font-family:var(--f-mono);font-size:12.5px;font-weight:600;margin-top:1px;
 }
 .q p{margin:0;font-size:14.5px;color:var(--ink-2);word-break:keep-all}
+.q b{color:var(--em);font-weight:600}
+
+/* ── 패들렛으로 제출 ────────────────────────────────────── */
+.padlet{
+  display:flex;align-items:center;gap:16px;
+  padding:18px 22px;text-decoration:none;color:inherit;
+  background:var(--surface);border:2px solid var(--em);border-radius:var(--r-m);
+  transition:background .15s,box-shadow .15s,transform .08s;
+}
+.padlet:hover{background:var(--surface-2);box-shadow:var(--shadow)}
+.padlet:active{transform:translateY(1px)}
+.padlet__icon{flex:none;font-size:30px;line-height:1}
+.padlet__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.padlet__title{font-size:19px;font-weight:700;color:var(--em);letter-spacing:-.01em}
+.padlet__desc{font-size:14px;color:var(--ink-2);word-break:keep-all}
+.padlet__go{
+  flex:none;white-space:nowrap;font-size:15px;font-weight:600;
+  background:var(--em);color:var(--paper);padding:9px 18px;border-radius:999px;
+}
 
 .colophon{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--line);padding-top:16px;word-break:keep-all;line-height:1.7}
 .colophon b{color:var(--ink-2);font-weight:600}
@@ -593,6 +617,8 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
   .bar-row{grid-template-columns:1fr;gap:5px}
   .bar-row__name{text-align:left}
   .bar--analog .bar__value{right:10px}
+  .padlet{flex-wrap:wrap;padding:14px 16px;gap:12px}
+  .padlet__go{width:100%;text-align:center}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
@@ -674,6 +700,17 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
       <li class="q"><span class="q__n">3</span><p>편지 말고도 예전엔 아날로그였지만 지금은 디지털로 바뀐 것을 두 가지 더 찾아보세요. 사진, 지도, 음악, 시계, 책&hellip;</p></li>
       <li class="q"><span class="q__n">4</span><p>빨라진 대신 <b>잃은 것</b>은 없을까요? 손으로 쓴 편지에만 남아 있는 가치는 무엇일까요?</p></li>
     </ol>
+
+    <!-- 생각을 적어 내는 곳. 이 앱은 아무것도 저장하지 않고 패들렛으로 보내기만 한다. -->
+    <a class="padlet" href="https://padlet.com/encosn/submission-request/BjRPz6pr2aMwvQGg"
+       target="_blank" rel="noopener noreferrer">
+      <span class="padlet__icon" aria-hidden="true">📝</span>
+      <span class="padlet__body">
+        <span class="padlet__title">패들렛에 내 생각 올리기</span>
+        <span class="padlet__desc">위 네 질문에 대한 내 생각을 패들렛에 적어 제출해요. 새 창으로 열립니다.</span>
+      </span>
+      <span class="padlet__go">패들렛 열기 →</span>
+    </a>
   </section>
 
   <p class="colophon"><b>시간 기준</b> · 종이 편지는 우체통 수거 회차 대기 → 발송 우체국 집하 → 우편집중국 자동구분기 분류 → 간선 운송 → 배달 우체국 순로 분류 → 집배원 배달까지의 일반우편 처리 흐름을 바탕으로 잡은 <b>대푯값</b>입니다. 실제 소요 시간은 거리, 요일, 수거 시각에 따라 달라집니다. 전자 우편의 전송 시간은 국내 구간 기준의 대푯값입니다.<br><b>화면 속 시간</b> · &lsquo;단계 관찰&rsquo;은 모든 단계가 눈에 보이도록 화면 재생 시간을 고르게 늘린 것이고, &lsquo;실제 비율&rsquo;은 두 방식의 실제 시간 비율을 그대로 압축한 것입니다. 어느 쪽이든 <b>시계에 표시되는 숫자는 실제 시간</b>입니다.</p>
