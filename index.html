@@ -359,7 +359,10 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
   padding:20px 22px;background:var(--surface);border:1px solid var(--line);
   border-left:4px solid var(--kraft);border-radius:var(--r-m);
 }
-.verdict p{margin:0;font-size:16px;color:var(--ink-2);word-break:keep-all;max-width:66ch}
+/* 결론도 머리말과 같은 규칙 — 폭을 제한하지 않고, 한 줄에 한 문장씩 읽힌다.
+   문장 span 은 updateBoard() 가 만든다. */
+.verdict p{margin:0;font-size:16px;color:var(--ink-2);word-break:keep-all}
+.verdict p > span{display:block}
 .verdict p+p{margin-top:10px}
 .verdict b{color:var(--em);font-weight:600}
 
@@ -394,6 +397,10 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
 
 .colophon{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--line);padding-top:16px;word-break:keep-all;line-height:1.7}
 .colophon b{color:var(--ink-2);font-weight:600}
+/* 맨 아래 설명도 한 줄에 한 문장씩. .colophon__group 은 「화면 속 시간」처럼
+   새 묶음이 시작되는 줄에 붙여 위와 한 칸 띄운다 (예전의 <br> 자리). */
+.colophon > span{display:block}
+.colophon > span.colophon__group{margin-top:10px}
 
 /* ── scenes ─────────────────────────────────────────────── */
 .stage{
@@ -713,7 +720,13 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
     </a>
   </section>
 
-  <p class="colophon"><b>시간 기준</b> · 종이 편지는 우체통 수거 회차 대기 → 발송 우체국 집하 → 우편집중국 자동구분기 분류 → 간선 운송 → 배달 우체국 순로 분류 → 집배원 배달까지의 일반우편 처리 흐름을 바탕으로 잡은 <b>대푯값</b>입니다. 실제 소요 시간은 거리, 요일, 수거 시각에 따라 달라집니다. 전자 우편의 전송 시간은 국내 구간 기준의 대푯값입니다.<br><b>화면 속 시간</b> · &lsquo;단계 관찰&rsquo;은 모든 단계가 눈에 보이도록 화면 재생 시간을 고르게 늘린 것이고, &lsquo;실제 비율&rsquo;은 두 방식의 실제 시간 비율을 그대로 압축한 것입니다. 어느 쪽이든 <b>시계에 표시되는 숫자는 실제 시간</b>입니다.</p>
+  <p class="colophon">
+    <span><b>시간 기준</b> · 종이 편지는 우체통 수거 회차 대기 → 발송 우체국 집하 → 우편집중국 자동구분기 분류 → 간선 운송 → 배달 우체국 순로 분류 → 집배원 배달까지의 일반우편 처리 흐름을 바탕으로 잡은 <b>대푯값</b>입니다.</span>
+    <span>실제 소요 시간은 거리, 요일, 수거 시각에 따라 달라집니다.</span>
+    <span>전자 우편의 전송 시간은 국내 구간 기준의 대푯값입니다.</span>
+    <span class="colophon__group"><b>화면 속 시간</b> · &lsquo;단계 관찰&rsquo;은 모든 단계가 눈에 보이도록 화면 재생 시간을 고르게 늘린 것이고, &lsquo;실제 비율&rsquo;은 두 방식의 실제 시간 비율을 그대로 압축한 것입니다.</span>
+    <span>어느 쪽이든 <b>시계에 표시되는 숫자는 실제 시간</b>입니다.</span>
+  </p>
 
 </div>
 
@@ -1322,15 +1335,18 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
     if(ad && dd){
       revealFacts(true);
       boardNote.textContent = '두 편지 모두 도착했습니다.';
+      // 문장마다 <span> 으로 감싼다 — CSS 가 블록으로 만들어 한 줄에 한 문장씩 보인다
       verdict1.innerHTML =
-        '같은 내용을 보내는 데 종이 편지는 <b>' + plainTime(A.totalReal,'long') + '</b>, 전자 우편은 <b>' +
-        plainTime(D.totalReal,'short') + '</b>이 걸렸습니다. 종이 편지가 쓴 시간의 대부분(' +
-        plainTime(A.sysReal,'long') + ')은 <b>기다림과 옮김</b>이었습니다. 수거를 기다리고, 트럭에 실려 가고, 다시 분류되기를 반복하는 동안 편지는 아무것도 하지 않고 그저 이동했습니다.';
+        '<span>같은 내용을 보내는 데 종이 편지는 <b>' + plainTime(A.totalReal,'long') + '</b>, 전자 우편은 <b>' +
+        plainTime(D.totalReal,'short') + '</b>이 걸렸습니다.</span>' +
+        '<span>종이 편지가 쓴 시간의 대부분(' + plainTime(A.sysReal,'long') + ')은 <b>기다림과 옮김</b>이었습니다.</span>' +
+        '<span>수거를 기다리고, 트럭에 실려 가고, 다시 분류되기를 반복하는 동안 편지는 아무것도 하지 않고 그저 이동했습니다.</span>';
       verdict2.hidden = false;
       verdict2.innerHTML =
-        '전자 우편에는 그 단계가 통째로 없습니다. 사람이 옮길 물건이 아니라 <b>데이터</b>이기 때문입니다. 그래서 시간과 비용이 줄었고, ' +
-        '거기에 더해 <b>글자 말고도 사진·문서·동영상</b>을 같이 보낼 수 있게 되었습니다. 종이 편지 한 통이 가는 동안 전자 우편은 약 ' +
-        comma(mailCount) + '통을 보낼 수 있습니다.';
+        '<span>전자 우편에는 그 단계가 통째로 없습니다.</span>' +
+        '<span>사람이 옮길 물건이 아니라 <b>데이터</b>이기 때문입니다.</span>' +
+        '<span>그래서 시간과 비용이 줄었고, 거기에 더해 <b>글자 말고도 사진·문서·동영상</b>을 같이 보낼 수 있게 되었습니다.</span>' +
+        '<span>종이 편지 한 통이 가는 동안 전자 우편은 약 ' + comma(mailCount) + '통을 보낼 수 있습니다.</span>';
     } else if(ad || dd){
       boardNote.textContent = dd && !ad ? '전자 우편 도착. 종이 편지는 아직 가는 중입니다.' : '종이 편지 도착.';
     }
