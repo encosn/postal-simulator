@@ -1,0 +1,1427 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>우체통에서 받은편지함까지 — 중학교 정보 2단원</title>
+<meta name="description" content="같은 내용의 편지를 종이 편지와 전자 우편으로 동시에 보내 어디를 거쳐 얼마나 걸리는지 나란히 비교하는 수업용 시뮬레이션. 중학교 정보 2단원 데이터 [9정02-01]">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Nanum+Pen+Script&display=swap">
+<style>
+/* 브라우저 기본값 정리 — 아래 본문 style 이 실제 꾸미기를 맡는다 */
+:root{color-scheme:light dark}
+body{margin:0;padding:0;background:#faf9f5;color:#141413}
+img{max-width:100%}
+[hidden]:not([hidden=until-found]){display:none!important}
+</style>
+</head>
+<body>
+
+<style>
+/* ── tokens ─────────────────────────────────────────────── */
+:root{
+  --paper:#F6F2EA;
+  --surface:#FFFCF6;
+  --surface-2:#EFE9DC;
+  --ink:#22201C;
+  --ink-2:#5C564C;
+  --ink-3:#8E877A;
+  --line:#DFD7C7;
+  --line-2:#CFC5B0;
+
+  --post:#D33B2C;
+  --post-soft:#F7E4E0;
+  --kraft:#C9A46A;
+  --net:#1E6BE6;
+  --net-soft:#E2EBFC;
+  --signal:#00A48F;
+
+  --f-ui:'IBM Plex Sans KR','Malgun Gothic','맑은 고딕',system-ui,-apple-system,sans-serif;
+  --f-hand:'Nanum Pen Script','Malgun Gothic','맑은 고딕',cursive;
+  --f-mono:'IBM Plex Mono','Consolas',ui-monospace,monospace;
+
+  --r-s:6px; --r-m:10px; --r-l:16px;
+  --shadow:0 1px 2px rgba(40,32,18,.06),0 8px 24px -14px rgba(40,32,18,.28);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#15171B;
+    --surface:#1D2026;
+    --surface-2:#252932;
+    --ink:#ECE7DE;
+    --ink-2:#B2AAA0;
+    --ink-3:#847D73;
+    --line:#31353D;
+    --line-2:#414751;
+
+    --post:#FF7360;
+    --post-soft:#3A2320;
+    --kraft:#D9B67F;
+    --net:#74AAFF;
+    --net-soft:#17263D;
+    --signal:#2FD9C0;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#15171B;
+  --surface:#1D2026;
+  --surface-2:#252932;
+  --ink:#ECE7DE;
+  --ink-2:#B2AAA0;
+  --ink-3:#847D73;
+  --line:#31353D;
+  --line-2:#414751;
+  --post:#FF7360;
+  --post-soft:#3A2320;
+  --kraft:#D9B67F;
+  --net:#74AAFF;
+  --net-soft:#17263D;
+  --signal:#2FD9C0;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -16px rgba(0,0,0,.8);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-ui);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+:focus-visible{outline:2.5px solid var(--net);outline-offset:2px;border-radius:4px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:28px 22px 64px;display:flex;flex-direction:column;gap:26px}
+
+/* ── header ─────────────────────────────────────────────── */
+.masthead{display:flex;flex-direction:column;gap:10px;padding-bottom:22px;border-bottom:2px solid var(--ink)}
+.eyebrow{
+  font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+}
+.eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--kraft);flex:none}
+h1{
+  margin:0;font-size:clamp(30px,5.2vw,52px);font-weight:700;letter-spacing:-.02em;
+  line-height:1.14;text-wrap:balance;
+}
+.lead{margin:0;max-width:58ch;color:var(--ink-2);font-size:clamp(15px,1.6vw,17.5px)}
+.lead b{color:var(--ink);font-weight:600}
+
+/* ── controls ───────────────────────────────────────────── */
+.console{
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px;
+  padding:14px 16px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-l);box-shadow:var(--shadow);
+  position:sticky;top:0;z-index:20;
+}
+.btn{
+  font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);
+  padding:9px 16px;border-radius:999px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:background .15s,border-color .15s,transform .08s;
+}
+.btn:hover{background:var(--line);border-color:var(--ink-3)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn--go{
+  background:var(--ink);color:var(--paper);border-color:var(--ink);
+  min-width:148px;justify-content:center;
+}
+.btn--go:hover{background:var(--ink-2);border-color:var(--ink-2)}
+
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line-2);border-radius:999px;padding:3px}
+.seg button{
+  font-family:inherit;font-size:13.5px;font-weight:600;color:var(--ink-2);
+  background:none;border:0;padding:6px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;
+}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.seg-label{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
+.console__group{display:flex;align-items:center;gap:8px}
+.console__spacer{flex:1 1 12px}
+
+/* ── lanes ──────────────────────────────────────────────── */
+.lanes{display:flex;flex-direction:column;gap:18px}
+.lane{
+  --accent:var(--ink-2); --accent-soft:var(--surface-2);
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);
+  box-shadow:var(--shadow);overflow:hidden;position:relative;
+}
+.lane--analog{--accent:var(--post);--accent-soft:var(--post-soft)}
+.lane--digital{--accent:var(--net);--accent-soft:var(--net-soft)}
+.lane::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--accent)}
+
+.lane__head{
+  display:flex;align-items:baseline;gap:16px 22px;flex-wrap:wrap;
+  padding:16px 20px 12px 24px;
+}
+.lane__id{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;min-width:0}
+.lane__badge{
+  font-size:13px;font-weight:600;letter-spacing:.04em;
+  color:var(--accent);background:var(--accent-soft);
+  border:1px solid color-mix(in srgb,var(--accent) 32%,transparent);
+  padding:3px 12px;border-radius:999px;white-space:nowrap;
+}
+.lane--analog .lane__badge{font-family:var(--f-hand);font-size:20px;line-height:1.35;padding:0 14px 2px}
+.lane--digital .lane__badge{font-family:var(--f-mono);font-size:12px;letter-spacing:.02em}
+.lane__title{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
+.lane__means{color:var(--ink-3);font-size:14px}
+
+.lane__clock{margin-left:auto;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.clock{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:600;
+  font-size:clamp(22px,3.4vw,32px);line-height:1.05;color:var(--accent);letter-spacing:-.01em}
+.clock .u{font-family:var(--f-ui);font-size:.5em;font-weight:600;margin:0 .5em 0 .12em;color:var(--ink-2)}
+.clock .u:last-child{margin-right:0}
+.clock-label{font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+
+/* track */
+.track{padding:6px 20px 4px 24px;position:relative}
+.rail-area{position:relative;padding-top:26px}
+.rail{
+  position:absolute;left:0;right:0;top:34px;height:3px;
+  background:var(--line);border-radius:2px;
+}
+.rail__fill{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent);border-radius:2px;transition:width .1s linear}
+.lane--analog .rail{background:repeating-linear-gradient(90deg,var(--line) 0 7px,transparent 7px 12px)}
+
+.token{
+  position:absolute;top:34px;left:0;width:34px;height:34px;margin:-17px 0 0 -17px;
+  border-radius:50%;display:grid;place-items:center;font-size:17px;
+  background:var(--surface);border:2px solid var(--accent);z-index:4;
+  box-shadow:0 2px 10px -2px color-mix(in srgb,var(--accent) 55%,transparent);
+  transition:left .1s linear;
+}
+.lane--digital .token{border-radius:var(--r-s)}
+.lane.is-running .token{animation:bob 1.1s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+.streak{
+  position:absolute;top:34px;left:0;height:3px;width:0;z-index:3;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--signal),#fff);
+  opacity:0;pointer-events:none;
+}
+.streak.fire{animation:zip .45s cubic-bezier(.2,.7,.2,1) 1}
+@keyframes zip{
+  0%{width:0;opacity:0}
+  12%{opacity:1}
+  100%{width:100%;opacity:0}
+}
+
+.marker{
+  position:absolute;top:0;z-index:5;transform:translateX(-50%);
+  display:none;flex-direction:column;align-items:center;pointer-events:none;
+}
+.marker.show{display:flex}
+.marker__flag{
+  font-size:11px;font-weight:600;color:var(--net);background:var(--net-soft);
+  border:1px solid color-mix(in srgb,var(--net) 40%,transparent);
+  padding:1px 8px;border-radius:999px;white-space:nowrap;
+}
+.marker__stem{width:2px;height:14px;background:var(--net)}
+
+.stations{
+  list-style:none;margin:0;padding:0;display:flex;position:relative;z-index:2;
+  overflow-x:auto;scrollbar-width:thin;padding-bottom:8px;
+}
+.station{flex:1 1 0;min-width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;cursor:pointer}
+.station--end{cursor:default}
+.station:not(.station--end):hover .station__dot{border-color:var(--accent);filter:none;opacity:1}
+.station:not(.station--end):hover .station__label{color:var(--ink)}
+.station__dot{
+  width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface);border:2px solid var(--line-2);
+  font-size:15px;filter:grayscale(1);opacity:.55;
+  transition:border-color .2s,background .2s,opacity .2s,filter .2s,transform .2s;
+}
+.station.is-done .station__dot{border-color:var(--accent);background:var(--accent-soft);filter:none;opacity:1}
+.station.is-active .station__dot{
+  border-color:var(--accent);background:var(--accent-soft);filter:none;opacity:1;transform:scale(1.22);
+  box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 16%,transparent);
+}
+.station__label{
+  font-size:11.5px;line-height:1.28;color:var(--ink-3);word-break:keep-all;
+  max-width:80px;transition:color .2s
+}
+.station.is-active .station__label{color:var(--ink);font-weight:600}
+.station.is-done .station__label{color:var(--ink-2)}
+.station--end .station__dot{border-style:dashed}
+.station--end.is-done .station__dot{border-style:solid}
+
+/* now-playing card */
+.now{
+  display:flex;align-items:flex-start;gap:16px;
+  margin:2px 20px 18px 24px;padding:14px 16px;
+  background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 26%,transparent);
+  border-radius:var(--r-m);
+}
+.now__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;padding-top:2px}
+.now__meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{
+  font-size:11px;font-weight:600;letter-spacing:.05em;padding:1px 8px;border-radius:var(--r-s);
+  border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface);
+}
+.chip--sys{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+.now__step{font-size:11.5px;font-weight:600;letter-spacing:.08em;color:var(--ink-3);font-family:var(--f-mono)}
+.now__name{margin:0;font-size:17.5px;font-weight:600;letter-spacing:-.01em;line-height:1.35;word-break:keep-all}
+.now__desc{margin:0;font-size:14.5px;color:var(--ink-2);word-break:keep-all;max-width:62ch}
+.now__dur{
+  flex:none;text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;
+  font-size:19px;font-weight:600;color:var(--accent);padding-left:8px;
+}
+.now__dur small{display:block;font-family:var(--f-ui);font-size:10.5px;font-weight:600;
+  letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
+
+/* arrival stamp */
+.stamp{
+  position:absolute;right:18px;top:12px;z-index:8;
+  display:none;place-items:center;transform:rotate(-11deg);
+}
+.stamp.show{display:grid;animation:thud .38s cubic-bezier(.2,1.5,.4,1) 1}
+@keyframes thud{0%{transform:rotate(-11deg) scale(2.4);opacity:0}60%{opacity:1}100%{transform:rotate(-11deg) scale(1);opacity:1}}
+.stamp--post{
+  width:96px;height:96px;border-radius:50%;
+  border:2.5px dashed var(--post);color:var(--post);
+  font-family:var(--f-hand);font-size:26px;line-height:1;text-align:center;
+  padding-top:30px;letter-spacing:.02em;
+}
+.stamp--post span{display:block;font-size:12px;font-family:var(--f-ui);font-weight:600;margin-top:5px;letter-spacing:.04em}
+.stamp--net{
+  background:var(--net);color:#fff;border-radius:var(--r-m);
+  padding:9px 14px;font-size:14px;font-weight:600;transform:none;
+  box-shadow:0 6px 18px -6px color-mix(in srgb,var(--net) 70%,transparent);
+}
+.stamp--net.show{transform:none;animation:pop .3s ease-out 1}
+@keyframes pop{0%{transform:translateY(-10px);opacity:0}100%{transform:translateY(0);opacity:1}}
+.stamp--net b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* waiting note in digital lane */
+.waiting{
+  display:none;margin:-8px 20px 18px 24px;padding:12px 16px;
+  border:1px dashed color-mix(in srgb,var(--net) 45%,transparent);
+  border-radius:var(--r-m);background:transparent;
+  font-size:14.5px;color:var(--ink-2);word-break:keep-all;
+}
+.waiting.show{display:block}
+.waiting b{color:var(--net);font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:17px;font-weight:600}
+
+/* ── scoreboard ─────────────────────────────────────────── */
+.board{border-top:2px solid var(--ink);padding-top:22px;display:flex;flex-direction:column;gap:20px}
+.board__head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
+.board__note{font-size:13.5px;color:var(--ink-3)}
+
+.bars{display:flex;flex-direction:column;gap:16px}
+.bar-row{display:grid;grid-template-columns:112px 1fr;gap:14px;align-items:center}
+.bar-row__name{font-size:14px;font-weight:600;color:var(--ink-2);text-align:right;line-height:1.3}
+.bar-row__track{position:relative;height:34px;background:var(--surface-2);border-radius:var(--r-s);overflow:visible}
+.bar{
+  position:absolute;left:0;top:0;bottom:0;border-radius:var(--r-s);width:0;
+  transition:width .5s cubic-bezier(.3,.8,.3,1);
+  display:flex;align-items:center;
+}
+.bar--analog{background:var(--post)}
+.bar--digital{background:var(--net)}
+.bar__value{
+  position:absolute;left:100%;margin-left:10px;white-space:nowrap;
+  font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;color:var(--ink);
+}
+.bar--analog .bar__value{left:auto;right:12px;margin:0;color:#fff}
+.bar__value em{font-style:normal;font-family:var(--f-ui);font-size:12px;font-weight:500;color:var(--ink-3);margin-left:6px}
+.bar--analog .bar__value em{color:rgba(255,255,255,.75)}
+
+.facts{display:grid;grid-template-columns:1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden}
+@media (min-width:860px){.facts{grid-template-columns:repeat(3,1fr)}}
+.fact{background:var(--surface);padding:18px 18px 16px;display:flex;flex-direction:column;gap:5px}
+.fact__num{
+  font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:600;
+  font-size:clamp(28px,4.4vw,40px);line-height:1;letter-spacing:-.03em;color:var(--post);
+}
+.fact.is-hidden .fact__num{color:var(--ink-3);opacity:.45}
+.fact.is-hidden .fact__sub{color:var(--line-2)}
+.fact:nth-child(2) .fact__num{color:var(--net)}
+.fact:nth-child(3) .fact__num{color:var(--signal)}
+.fact__label{font-size:13.5px;font-weight:600;color:var(--ink)}
+.fact__sub{font-size:12.5px;color:var(--ink-3);word-break:keep-all;line-height:1.5}
+
+.verdict{
+  padding:20px 22px;background:var(--surface);border:1px solid var(--line);
+  border-left:4px solid var(--kraft);border-radius:var(--r-m);
+}
+.verdict p{margin:0;font-size:16px;color:var(--ink-2);word-break:keep-all;max-width:66ch}
+.verdict p+p{margin-top:10px}
+.verdict b{color:var(--ink);font-weight:600}
+
+/* ── think ──────────────────────────────────────────────── */
+.think{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:14px}
+.qs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:12px}
+.q{display:flex;gap:12px;padding:15px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m)}
+.q__n{
+  flex:none;width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--paper);
+  display:grid;place-items:center;font-family:var(--f-mono);font-size:12.5px;font-weight:600;margin-top:1px;
+}
+.q p{margin:0;font-size:14.5px;color:var(--ink-2);word-break:keep-all}
+
+.colophon{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--line);padding-top:16px;word-break:keep-all;line-height:1.7}
+.colophon b{color:var(--ink-2);font-weight:600}
+
+/* ── scenes ─────────────────────────────────────────────── */
+.stage{
+  flex:none;width:268px;aspect-ratio:320/152;
+  border-radius:var(--r-s);background:var(--surface);
+  border:1px solid color-mix(in srgb,var(--accent) 24%,transparent);
+  overflow:hidden;cursor:default;
+}
+.stage svg{display:block;width:100%;height:100%}
+.stage *{transform-box:fill-box;transform-origin:center}
+.stage text{font-family:var(--f-ui);fill:var(--ink)}
+
+.sv-ground{stroke:var(--line-2);stroke-width:1.5;stroke-linecap:round;fill:none}
+.sv-l{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sv-l2{fill:none;stroke:var(--ink-3);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.sv-fill{fill:var(--surface);stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
+.sv-soft{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.7;stroke-linejoin:round}
+.sv-acc{fill:var(--accent)}
+.sv-accl{fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linecap:round}
+.sv-kraft{fill:var(--kraft)}
+.sv-dim{fill:var(--ink-3)}
+.sv-night{fill:var(--ink);opacity:.9}
+.sv-txt{fill:var(--ink-3);font-family:var(--f-mono);font-size:10px;font-weight:500}
+.sv-txa{fill:var(--accent);font-family:var(--f-mono);font-size:10px;font-weight:600}
+.sv-dash{fill:none;stroke:var(--line-2);stroke-width:2;stroke-linecap:round}
+.sv-wr{fill:none;stroke:var(--ink-3);stroke-width:2.4;stroke-linecap:round;stroke-dasharray:var(--len)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+
+/* A1 문구점 */
+.a1p{animation:a1p 4.6s ease-in-out infinite}
+@keyframes a1p{0%{transform:translateX(-86px)}40%,80%{transform:translateX(0)}100%{transform:translateX(-86px)}}
+.a1e{animation:a1e 4.6s ease-in-out infinite}
+@keyframes a1e{0%,38%{opacity:0}48%,100%{opacity:1}}
+
+/* A2 편지 쓰기 */
+.a2w1{animation:a2w1 4.6s ease-in-out infinite}
+@keyframes a2w1{0%{stroke-dashoffset:var(--len)}18%,86%{stroke-dashoffset:0}100%{stroke-dashoffset:var(--len)}}
+.a2w2{animation:a2w2 4.6s ease-in-out infinite}
+@keyframes a2w2{0%,22%{stroke-dashoffset:var(--len)}40%,86%{stroke-dashoffset:0}100%{stroke-dashoffset:var(--len)}}
+.a2w3{animation:a2w3 4.6s ease-in-out infinite}
+@keyframes a2w3{0%,44%{stroke-dashoffset:var(--len)}62%,86%{stroke-dashoffset:0}100%{stroke-dashoffset:var(--len)}}
+.a2pen{animation:a2pen 4.6s ease-in-out infinite}
+@keyframes a2pen{
+  0%{transform:translate(0,0);opacity:1}
+  18%{transform:translate(114px,0)}
+  22%{transform:translate(0,22px)}
+  40%{transform:translate(114px,22px)}
+  44%{transform:translate(0,44px)}
+  62%{transform:translate(84px,44px);opacity:1}
+  88%{transform:translate(84px,44px);opacity:1}
+  96%,100%{transform:translate(84px,44px);opacity:0}
+}
+
+/* A3 봉투에 넣기 · 주소 쓰기 */
+.a3p{animation:a3p 4.6s ease-in-out infinite}
+@keyframes a3p{0%,8%{transform:translateY(-34px);opacity:1}34%{transform:translateY(4px);opacity:1}42%,100%{transform:translateY(4px);opacity:0}}
+.a3a1{animation:a3a1 4.6s ease-in-out infinite}
+@keyframes a3a1{0%,46%{stroke-dashoffset:var(--len)}60%,90%{stroke-dashoffset:0}100%{stroke-dashoffset:var(--len)}}
+.a3a2{animation:a3a2 4.6s ease-in-out infinite}
+@keyframes a3a2{0%,62%{stroke-dashoffset:var(--len)}76%,90%{stroke-dashoffset:0}100%{stroke-dashoffset:var(--len)}}
+
+/* A4 우표 붙이기 */
+.a4s{animation:a4s 3.8s cubic-bezier(.4,1.3,.5,1) infinite}
+@keyframes a4s{
+  0%{transform:translate(56px,-58px) rotate(30deg);opacity:0}
+  10%{opacity:1}
+  46%{transform:translate(0,0) rotate(0deg) scale(1)}
+  52%{transform:translate(0,0) rotate(0deg) scale(.9)}
+  60%,88%{transform:translate(0,0) rotate(0deg) scale(1);opacity:1}
+  100%{transform:translate(56px,-58px) rotate(30deg);opacity:0}
+}
+.a4r{animation:a4r 3.8s ease-out infinite}
+@keyframes a4r{0%,48%{opacity:0;transform:scale(.5)}56%{opacity:.65}76%,100%{opacity:0;transform:scale(2)}}
+
+/* A5 우체통에 넣기 */
+.a5p{animation:a5p 4.8s ease-in-out infinite}
+@keyframes a5p{0%{transform:translateX(-72px)}30%,86%{transform:translateX(0)}100%{transform:translateX(-72px)}}
+.a5e{animation:a5e 4.8s ease-in-out infinite}
+@keyframes a5e{0%,34%{transform:translate(0,0);opacity:1}52%{transform:translate(24px,-30px);opacity:1}60%{transform:translate(30px,-24px);opacity:0}100%{transform:translate(0,0);opacity:0}}
+
+/* A6 수거 대기 */
+.a6m{transform-box:view-box;transform-origin:246px 74px;animation:spin 1.5s linear infinite}
+.a6h{transform-box:view-box;transform-origin:246px 74px;animation:spin 9s linear infinite}
+.a6sun{animation:a6sun 5s ease-in-out infinite}
+@keyframes a6sun{0%,38%{opacity:1}52%,94%{opacity:0}100%{opacity:1}}
+.a6moon{animation:a6moon 5s ease-in-out infinite}
+@keyframes a6moon{0%,38%{opacity:0}52%,94%{opacity:1}100%{opacity:0}}
+
+/* A7 우체국 접수 */
+.a7st{animation:a7st 3.2s cubic-bezier(.5,0,.35,1) infinite}
+@keyframes a7st{0%,22%{transform:translateY(-36px)}40%{transform:translateY(0)}56%,100%{transform:translateY(-36px)}}
+.a7mk{animation:a7mk 3.2s ease-out infinite}
+@keyframes a7mk{0%,38%{opacity:0;transform:scale(.6)}46%{opacity:1;transform:scale(1)}90%{opacity:1}100%{opacity:0}}
+
+/* A8 · A12 바퀴, 도로 */
+.wheel{animation:spin .7s linear infinite}
+.a8t{animation:a8t 4.2s linear infinite}
+@keyframes a8t{0%{transform:translateX(-160px)}100%{transform:translateX(200px)}}
+.a8rd{stroke-dasharray:18 14;animation:a8rd .7s linear infinite}
+@keyframes a8rd{to{stroke-dashoffset:-32}}
+
+/* A9 자동 분류 */
+.a9belt{stroke-dasharray:13 10;animation:a9belt .55s linear infinite}
+@keyframes a9belt{to{stroke-dashoffset:-23}}
+.a9e{animation:a9e 3s linear infinite}
+@keyframes a9e{0%{transform:translateX(-84px)}64%{transform:translateX(96px)}100%{transform:translateX(200px) translateY(30px)}}
+.a9scan{animation:a9scan 1.5s ease-in-out infinite}
+@keyframes a9scan{0%,100%{opacity:0}18%,58%{opacity:1}}
+.a9code{animation:a9code 1.5s ease-in-out infinite}
+@keyframes a9code{0%,14%{opacity:0}30%,70%{opacity:1}86%,100%{opacity:0}}
+
+/* A10 간선 운송 */
+.a10rd{stroke-dasharray:26 20;animation:a10rd .5s linear infinite}
+@keyframes a10rd{to{stroke-dashoffset:-46}}
+.a10t{animation:a10t 1.2s ease-in-out infinite}
+@keyframes a10t{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+.a10s{animation:a10s 2.4s ease-in-out infinite}
+@keyframes a10s{0%,100%{opacity:.25}50%{opacity:1}}
+.wheel-f{animation:spin .45s linear infinite}
+
+/* A11 순로 분류 */
+.a11e{animation:a11e 2.4s ease-in-out infinite}
+@keyframes a11e{
+  0%{transform:translate(0,0);opacity:0}
+  10%{transform:translate(0,0);opacity:1}
+  56%{transform:translate(92px,-22px);opacity:1}
+  66%{transform:translate(100px,-22px);opacity:0}
+  100%{transform:translate(0,0);opacity:0}
+}
+.a11f{animation:a11f 7.2s steps(1) infinite}
+@keyframes a11f{0%,32%{opacity:0}33%,100%{opacity:1}}
+
+/* A12 집배원 배달 */
+.a12s{animation:a12s 4.8s ease-in-out infinite}
+@keyframes a12s{0%{transform:translateX(-150px)}32%,78%{transform:translateX(0)}100%{transform:translateX(-150px)}}
+.a12e{animation:a12e 4.8s ease-in-out infinite}
+@keyframes a12e{0%,36%{transform:translate(0,0);opacity:0}42%{opacity:1}62%{transform:translate(30px,-16px);opacity:1}70%,100%{transform:translate(36px,-12px);opacity:0}}
+
+/* D1 앱 열기 */
+.d1sc{animation:d1sc 3.4s ease-in-out infinite}
+@keyframes d1sc{0%,8%{opacity:0}20%,92%{opacity:1}100%{opacity:0}}
+.d1ic{animation:d1ic 3.4s cubic-bezier(.3,1.5,.5,1) infinite}
+@keyframes d1ic{0%,12%{transform:scale(.2);opacity:0}28%,44%{transform:scale(1);opacity:1}56%{transform:scale(1.7);opacity:0}100%{opacity:0}}
+.d1ui{animation:d1ui 3.4s ease-out infinite}
+@keyframes d1ui{0%,52%{opacity:0}62%,92%{opacity:1}100%{opacity:0}}
+
+/* D2 주소 입력 */
+.d2cl{transform-box:view-box;transform-origin:96px 0;animation:d2cl 3s steps(15) infinite}
+@keyframes d2cl{0%{transform:scaleX(0)}55%,88%{transform:scaleX(1)}100%{transform:scaleX(0)}}
+.d2cr{animation:blink .8s steps(1) infinite, d2car 3s steps(15) infinite}
+@keyframes d2car{0%{transform:translateX(0)}55%,88%{transform:translateX(94px)}100%{transform:translateX(0)}}
+.d2sg{animation:d2sg 3s ease-out infinite}
+@keyframes d2sg{0%,58%{opacity:0;transform:translateY(-5px)}68%,88%{opacity:1;transform:translateY(0)}100%{opacity:0}}
+
+/* D3 내용 입력 */
+.d3w1{animation:a2w1 2.6s linear infinite}
+.d3w2{animation:a2w2 2.6s linear infinite}
+.d3w3{animation:a2w3 2.6s linear infinite}
+.d3cr{animation:blink .55s steps(1) infinite}
+
+/* D4 첨부 */
+.d4c{animation:d4c 2.8s cubic-bezier(.3,1.4,.5,1) infinite}
+@keyframes d4c{0%{transform:translateY(44px) scale(.7);opacity:0}24%,86%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(0) scale(1);opacity:0}}
+
+/* D5 보내기 */
+.d5cur{animation:d5cur 2.6s ease-in-out infinite}
+@keyframes d5cur{0%{transform:translate(-62px,36px)}36%,100%{transform:translate(0,0)}}
+.d5btn{animation:d5btn 2.6s ease-out infinite}
+@keyframes d5btn{0%,36%{transform:scale(1)}44%{transform:scale(.9)}54%,100%{transform:scale(1)}}
+.d5r{animation:d5r 2.6s ease-out infinite}
+@keyframes d5r{0%,38%{opacity:0;transform:scale(.4)}48%{opacity:.7}74%,100%{opacity:0;transform:scale(2.4)}}
+
+/* D6 메일 서버 */
+.wire{stroke-dasharray:7 7;animation:wire .55s linear infinite}
+@keyframes wire{to{stroke-dashoffset:-14}}
+.d6p{animation:d6p 1.5s cubic-bezier(.45,0,.5,1) infinite}
+@keyframes d6p{0%{transform:translateX(0);opacity:0}12%{opacity:1}82%{transform:translateX(138px);opacity:1}92%,100%{transform:translateX(148px);opacity:0}}
+
+/* D7 주소 조회 */
+.d7q{animation:d7q 2.2s ease-in-out infinite}
+@keyframes d7q{0%{transform:translateX(0);opacity:0}8%{opacity:1}40%{transform:translateX(132px);opacity:1}47%,100%{opacity:0}}
+.d7a{animation:d7a 2.2s ease-in-out infinite}
+@keyframes d7a{0%,49%{transform:translateX(132px);opacity:0}56%{opacity:1}88%{transform:translateX(0);opacity:1}95%,100%{opacity:0}}
+
+/* D8 인터넷 망 */
+.d8p{animation:d8p 2s linear infinite}
+@keyframes d8p{0%{transform:translateX(0)}25%{transform:translateX(58px)}50%{transform:translateX(116px)}75%{transform:translateX(174px)}100%{transform:translateX(232px)}}
+.d8b{animation:d8b .5s ease-in-out infinite}
+@keyframes d8b{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.d8n{animation:d8n 2s ease-out infinite}
+@keyframes d8n{0%,18%{fill:var(--surface)}26%{fill:var(--accent)}60%,100%{fill:var(--surface)}}
+
+/* D9 받은편지함 도착 */
+.d9e{animation:d9e 2.6s cubic-bezier(.35,1.35,.5,1) infinite}
+@keyframes d9e{0%{transform:translateY(-52px);opacity:0}12%{opacity:1}46%,100%{transform:translateY(0);opacity:1}}
+.d9b{animation:d9b 2.6s cubic-bezier(.3,1.7,.5,1) infinite}
+@keyframes d9b{0%,46%{transform:scale(0);opacity:0}58%,100%{transform:scale(1);opacity:1}}
+.d9r{animation:d9r 2.6s ease-out infinite}
+@keyframes d9r{0%,48%{opacity:0;transform:scale(.5)}58%{opacity:.6}80%,100%{opacity:0;transform:scale(2.2)}}
+
+/* ── responsive ─────────────────────────────────────────── */
+@media (max-width:960px){
+  .now{flex-wrap:wrap}
+  .stage{width:100%;max-width:320px}
+  .now__body{flex:1 1 240px}
+}
+@media (max-width:720px){
+  .wrap{padding:20px 14px 48px;gap:20px}
+  .console{position:static;padding:12px}
+  .console__spacer{display:none}
+  .lane__head{padding:14px 14px 10px 18px}
+  .lane__clock{margin-left:0;width:100%;align-items:flex-start;text-align:left}
+  .track{padding:4px 14px 4px 18px}
+  .now{margin:2px 14px 14px 18px;flex-wrap:wrap;padding:12px}
+  .now__dur{text-align:left;padding:0}
+  .waiting{margin:-6px 14px 14px 18px}
+  .stamp{right:10px;top:8px}
+  .stamp--post{width:78px;height:78px;font-size:21px;padding-top:24px}
+  .bar-row{grid-template-columns:1fr;gap:5px}
+  .bar-row__name{text-align:left}
+  .bar--analog .bar__value{right:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  /* scenes are authored so the un-animated pose is a readable still illustration */
+  .stage *{animation:none !important;transition:none !important}
+}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow"><span>중학교 정보 · 데이터의 표현</span><span class="dot"></span><span>47쪽 해 보기 2</span></div>
+    <h1>우체통에서 받은편지함까지</h1>
+    <p class="lead">같은 내용의 편지를 같은 시각에 부칩니다. 하나는 <b>종이에 손으로 써서 우체통</b>에, 하나는 <b>화면에 입력해서 보내기 버튼</b>으로. 두 편지가 상대에게 닿기까지 어디를 거치고 얼마나 걸리는지 나란히 따라가 보세요. <b>노선도의 아이콘을 누르면</b> 그 단계에서 실제로 무슨 일이 벌어지는지 볼 수 있습니다.</p>
+  </header>
+
+  <div class="console" role="group" aria-label="시뮬레이션 조작">
+    <button class="btn btn--go" id="play" type="button">▶ 동시에 출발</button>
+    <button class="btn" id="step" type="button">한 단계씩 →</button>
+    <button class="btn" id="reset" type="button">↺ 처음부터</button>
+
+    <div class="console__spacer"></div>
+
+    <div class="console__group">
+      <span class="seg-label">시간 축</span>
+      <div class="seg" id="mode" role="group" aria-label="시간 축 선택">
+        <button type="button" data-mode="observe" aria-pressed="true">단계 관찰</button>
+        <button type="button" data-mode="real" aria-pressed="false">실제 비율</button>
+      </div>
+    </div>
+
+    <div class="console__group">
+      <span class="seg-label">속도</span>
+      <div class="seg" id="speed" role="group" aria-label="재생 속도 선택">
+        <button type="button" data-speed="1" aria-pressed="true">1×</button>
+        <button type="button" data-speed="2" aria-pressed="false">2×</button>
+        <button type="button" data-speed="4" aria-pressed="false">4×</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="lanes" id="lanes"></div>
+
+  <section class="board" aria-labelledby="board-title">
+    <div class="board__head">
+      <h2 id="board-title">걸린 시간 비교</h2>
+      <span class="board__note" id="boardNote">출발하면 두 편지의 기록이 여기 쌓입니다.</span>
+    </div>
+
+    <div class="bars">
+      <div class="bar-row">
+        <div class="bar-row__name">종이 편지<br>전 과정</div>
+        <div class="bar-row__track"><div class="bar bar--analog" id="barA"><span class="bar__value" id="barAv"></span></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-row__name">전자 우편<br>전 과정</div>
+        <div class="bar-row__track"><div class="bar bar--digital" id="barD"><span class="bar__value" id="barDv"></span></div></div>
+      </div>
+    </div>
+
+    <div class="facts" id="facts"></div>
+
+    <div class="verdict">
+      <p id="verdict1">두 편지가 모두 도착하면 여기에 결론이 나타납니다.</p>
+      <p id="verdict2" hidden></p>
+    </div>
+  </section>
+
+  <section class="think" aria-labelledby="think-title">
+    <h2 id="think-title">생각해 보기</h2>
+    <ol class="qs">
+      <li class="q"><span class="q__n">1</span><p>종이 편지의 12단계 중 전자 우편에는 <b>아예 없는 단계</b>는 몇 개인가요? 그 단계들은 왜 사라졌을까요?</p></li>
+      <li class="q"><span class="q__n">2</span><p>전자 우편이 빠른 이유가 &lsquo;기계가 빨라서&rsquo;뿐일까요? 사람이 직접 하던 일 중 무엇이 없어졌는지 짚어 보세요.</p></li>
+      <li class="q"><span class="q__n">3</span><p>편지 말고도 예전엔 아날로그였지만 지금은 디지털로 바뀐 것을 두 가지 더 찾아보세요. 사진, 지도, 음악, 시계, 책&hellip;</p></li>
+      <li class="q"><span class="q__n">4</span><p>빨라진 대신 <b>잃은 것</b>은 없을까요? 손으로 쓴 편지에만 남아 있는 가치는 무엇일까요?</p></li>
+    </ol>
+  </section>
+
+  <p class="colophon"><b>시간 기준</b> · 종이 편지는 우체통 수거 회차 대기 → 발송 우체국 집하 → 우편집중국 자동구분기 분류 → 간선 운송 → 배달 우체국 순로 분류 → 집배원 배달까지의 일반우편 처리 흐름을 바탕으로 잡은 <b>대푯값</b>입니다. 실제 소요 시간은 거리, 요일, 수거 시각에 따라 달라집니다. 전자 우편의 전송 시간은 국내 구간 기준의 대푯값입니다.<br><b>화면 속 시간</b> · &lsquo;단계 관찰&rsquo;은 모든 단계가 눈에 보이도록 화면 재생 시간을 고르게 늘린 것이고, &lsquo;실제 비율&rsquo;은 두 방식의 실제 시간 비율을 그대로 압축한 것입니다. 어느 쪽이든 <b>시계에 표시되는 숫자는 실제 시간</b>입니다.</p>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var MIN = 60, HOUR = 3600;
+
+  var LANES = [
+    {
+      key:'analog', cls:'lane--analog', badge:'아날로그 방식', title:'종이 편지',
+      means:'편지지 · 봉투 · 우표 · 우체통', token:'✉️', endIcon:'🏠', endLabel:'우편함 도착',
+      sysChip:'우편 시스템이 하는 일', meChip:'내가 하는 일',
+      fmt:'long',
+      steps:[
+        {icon:'🏪', label:'편지지 사기', name:'문구점에서 편지지와 봉투 사기', real:30*MIN, obs:2.6, who:'me',
+         desc:'집을 나서 문구점까지 걸어간다. 편지지를 고르고 봉투도 함께 산다. 마음에 드는 게 없으면 다른 가게로.'},
+        {icon:'✍️', label:'편지 쓰기', name:'종이에 손으로 편지 쓰기', real:25*MIN, obs:3.4, who:'me',
+         desc:'한 글자씩 손으로 쓴다. 잘못 쓰면 지우거나 종이를 버리고 처음부터 다시 쓴다.'},
+        {icon:'📄', label:'주소 쓰기', name:'봉투에 넣고 주소·우편번호 쓰기', real:5*MIN, obs:2.0, who:'me',
+         desc:'받는 사람 주소와 다섯 자리 우편번호, 보내는 사람 주소를 적는다. 한 글자만 틀려도 편지는 길을 잃는다.'},
+        {icon:'🎫', label:'우표 붙이기', name:'우표를 사서 붙이기', real:25*MIN, obs:2.6, who:'me',
+         desc:'우체국이나 편의점에 들러 우표를 산다. 무게와 크기에 따라 요금이 달라서 맞는 우표를 골라야 한다.'},
+        {icon:'📮', label:'우체통에 넣기', name:'우체통까지 걸어가서 넣기', real:15*MIN, obs:2.2, who:'me',
+         desc:'가장 가까운 우체통을 찾아간다. 투입구에 넣는 순간 편지는 내 손을 떠나고, 이제 되돌릴 수 없다.'},
+        {icon:'⏳', label:'수거 대기', name:'우체통 수거를 기다리는 시간', real:11*HOUR, obs:3.6, who:'sys',
+         desc:'우체통은 하루 중 정해진 시각에만 열린다. 방금 수거해 간 뒤였다면 다음 회차까지 그대로 기다린다.'},
+        {icon:'🏣', label:'우체국 접수', name:'발송 우체국에서 집하·접수', real:5*HOUR, obs:3.2, who:'sys',
+         desc:'수거한 우편물을 우체국에 모아 요금이 맞는지 확인하고 발송할 묶음으로 만든다.'},
+        {icon:'🚚', label:'집중국 운송', name:'우편집중국으로 운송', real:4*HOUR, obs:3.0, who:'sys',
+         desc:'여러 우체국의 우편물이 지역의 우편집중국 한 곳으로 모인다.'},
+        {icon:'⚙️', label:'자동 분류', name:'우편번호를 읽어 자동 분류', real:9*HOUR, obs:3.6, who:'sys',
+         desc:'자동구분기가 봉투의 우편번호를 읽어 도착 지역별로 나눈다. 대부분 사람들이 잠든 밤에 이루어진다.'},
+        {icon:'🛣️', label:'간선 운송', name:'도착지 우편집중국까지 간선 운송', real:13*HOUR, obs:4.2, who:'sys',
+         desc:'대형 트럭이 고속도로를 달려 밤새 이동한다. 거리가 멀수록 하루가 더 붙는다.'},
+        {icon:'🏤', label:'순로 분류', name:'배달 우체국 도착 후 순로 분류', real:16*HOUR, obs:4.6, who:'sys',
+         desc:'집배원이 자기가 맡은 구역의 우편물을 배달할 순서대로 정리한다. 새벽에 도착하면 그날 배달 회차를 기다린다.'},
+        {icon:'🛵', label:'집배원 배달', name:'집배원이 우편함에 넣기', real:12*HOUR, obs:4.0, who:'sys',
+         desc:'오토바이를 타고 골목을 돌며 집집마다 우편함에 넣는다. 드디어 도착.'}
+      ]
+    },
+    {
+      key:'digital', cls:'lane--digital', badge:'DIGITAL', title:'전자 우편',
+      means:'키보드 · 보내기 버튼 · 인터넷', token:'⚡', endIcon:'📱', endLabel:'받은편지함 도착',
+      sysChip:'인터넷이 하는 일', meChip:'내가 하는 일',
+      fmt:'short',
+      steps:[
+        {icon:'💻', label:'앱 열기', name:'메일 앱 열기', real:5, obs:1.2, who:'me',
+         desc:'아이콘을 누르면 바로 새 편지 화면이 뜬다. 편지지를 사러 나갈 일이 없다.'},
+        {icon:'📇', label:'주소 입력', name:'받는 사람 주소 입력', real:12, obs:1.4, who:'me',
+         desc:'주소록에서 이름을 고르거나 메일 주소를 친다. 형식이 틀리면 보내기 전에 곧바로 알려준다.'},
+        {icon:'⌨️', label:'내용 입력', name:'제목과 내용 입력', real:60, obs:2.2, who:'me',
+         desc:'키보드로 입력한다. 틀리면 지우고 다시 쓰면 그만이라 종이를 버릴 일이 없다.'},
+        {icon:'📎', label:'첨부', name:'사진·문서 첨부', real:8, obs:1.3, who:'me',
+         desc:'글자뿐 아니라 사진, 문서, 동영상도 함께 보낸다. 종이 봉투에는 넣을 수 없는 것들이다.'},
+        {icon:'🖱️', label:'보내기', name:'보내기 버튼 클릭', real:1, obs:0.9, who:'me',
+         desc:'버튼 하나. 우표도, 우체통까지 걸어갈 일도 없다.'},
+        {icon:'📤', label:'메일 서버', name:'보내는 메일 서버로 전송', real:0.20, obs:0.75, who:'sys',
+         desc:'내 기기가 편지를 메일 서버에 넘긴다. 여기서부터는 사람 손이 닿지 않는다.'},
+        {icon:'🧭', label:'주소 조회', name:'받는 사람의 메일 서버 찾기', real:0.08, obs:0.60, who:'sys',
+         desc:'메일 주소 뒤쪽 도메인으로 어느 서버에 보내야 하는지 알아낸다. 종이 편지의 우편번호 읽기에 해당한다.'},
+        {icon:'🌐', label:'인터넷 전송', name:'인터넷 망을 거쳐 전달', real:0.35, obs:0.95, who:'sys',
+         desc:'데이터가 여러 라우터를 건너뛰며 목적지 서버까지 간다. 지구 반대편이어도 걸리는 시간은 거의 같다.'},
+        {icon:'📥', label:'받은편지함', name:'받은편지함에 저장 후 알림', real:0.25, obs:0.70, who:'sys',
+         desc:'받은편지함에 저장되고 상대의 기기에 알림이 뜬다. 상대는 곧바로 열어 볼 수 있다.'}
+      ]
+    }
+  ];
+
+  /* ── derived numbers ─────────────────────────────────── */
+  function sum(arr, f){ var t=0; for(var i=0;i<arr.length;i++) t+=f(arr[i]); return t; }
+  LANES.forEach(function(L){
+    L.totalReal = sum(L.steps, function(s){ return s.real; });
+    L.sysReal   = sum(L.steps.filter(function(s){return s.who==='sys';}), function(s){ return s.real; });
+    L.totalObs  = sum(L.steps, function(s){ return s.obs; });
+  });
+  var A = LANES[0], D = LANES[1];
+
+  var REAL_MODE_ANALOG_SECONDS = 42;              // 실제 비율 모드에서 종이 편지 완주에 쓰는 화면 시간
+  var REAL_SCALE = REAL_MODE_ANALOG_SECONDS / A.totalReal;
+
+  /* ── formatting ──────────────────────────────────────── */
+  function clockHTML(sec, kind){
+    var p = [];
+    if(kind === 'long'){
+      var d = Math.floor(sec/86400), h = Math.floor((sec%86400)/3600), m = Math.floor((sec%3600)/60);
+      if(d) p.push([d,'일']);
+      if(d || h) p.push([h,'시간']);
+      p.push([m,'분']);
+    } else {
+      if(sec >= 60){
+        p.push([Math.floor(sec/60),'분']);
+        p.push([(sec%60).toFixed(1),'초']);
+      } else {
+        p.push([sec.toFixed(2),'초']);
+      }
+    }
+    return p.map(function(x){ return x[0] + '<span class="u">' + x[1] + '</span>'; }).join('');
+  }
+  function durText(sec){
+    if(sec >= HOUR){
+      var h = sec/HOUR;
+      return (h % 1 === 0 ? h : h.toFixed(1)) + '시간';
+    }
+    if(sec >= MIN) return Math.round(sec/MIN) + '분';
+    if(sec >= 1)   return sec + '초';
+    return sec.toFixed(2) + '초';
+  }
+  function plainTime(sec, kind){
+    return clockHTML(sec, kind).replace(/<span class="u">/g,' ').replace(/<\/span>/g,'');
+  }
+  function comma(n){ return Math.round(n).toLocaleString('ko-KR'); }
+
+  /* ── scenes ──────────────────────────────────────────────
+     One small stage per step, drawn as inline SVG. Every scene is authored so
+     that its un-animated pose is already a readable still (reduced motion). */
+  var S  = '<svg viewBox="0 0 320 152" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+  var _S = '</svg>';
+  var GROUND = '<path class="sv-ground" d="M8 130h304"/>';
+
+  function env(x, y, w, cls){
+    var h = Math.round(w * 0.66);
+    return '<g' + (cls ? ' class="' + cls + '"' : '') + '>' +
+      '<rect class="sv-fill" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="2"/>' +
+      '<path class="sv-l2" d="M'+(x+2)+' '+(y+2.5)+'L'+(x+w/2)+' '+(y+h*0.58)+'L'+(x+w-2)+' '+(y+2.5)+'"/></g>';
+  }
+  function walker(x, inner){
+    return '<circle class="sv-fill" cx="'+x+'" cy="86" r="9"/>' +
+      '<path class="sv-l" d="M'+x+' 95v18 M'+(x-10)+' 102h20 M'+x+' 113l-7 17 M'+x+' 113l7 17"/>' + (inner || '');
+  }
+  function screen(x, y, w, h){
+    return '<rect class="sv-fill" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="6"/>';
+  }
+
+  var SCENES = {
+    analog: [
+      /* 1 문구점 */ function(){ return S + GROUND +
+        '<rect class="sv-fill" x="186" y="50" width="116" height="80" rx="3"/>' +
+        '<path class="sv-acc" d="M182 48h124l-10 15H192z"/>' +
+        '<rect class="sv-soft" x="196" y="72" width="54" height="40" rx="2"/>' +
+        '<rect class="sv-fill" x="262" y="80" width="32" height="50" rx="2"/>' +
+        '<text class="sv-txt" x="201" y="90">편지지</text>' +
+        '<text class="sv-txt" x="201" y="105">봉투</text>' +
+        '<g class="a1p">' + walker(112, '<g class="a1e">' + env(120, 96, 24) + '</g>') + '</g>' + _S; },
+
+      /* 2 편지 쓰기 */ function(){ return S +
+        '<rect class="sv-fill" x="72" y="18" width="176" height="120" rx="3"/>' +
+        '<path class="sv-l2" d="M92 34h52"/>' +
+        '<path class="sv-wr a2w1" style="--len:118" d="M92 60h118"/>' +
+        '<path class="sv-wr a2w2" style="--len:118" d="M92 82h118"/>' +
+        '<path class="sv-wr a2w3" style="--len:88" d="M92 104h88"/>' +
+        '<g class="a2pen"><polygon class="sv-acc" points="92,60 96,51 112,25 121,30 105,56"/>' +
+        '<circle class="sv-acc" cx="92" cy="60" r="1.8"/></g>' + _S; },
+
+      /* 3 봉투·주소 */ function(){ return S +
+        '<g class="a3p"><rect class="sv-fill" x="118" y="40" width="88" height="48" rx="2"/>' +
+        '<path class="sv-l2" d="M130 54h64 M130 66h64 M130 78h40"/></g>' +
+        '<rect class="sv-fill" x="80" y="66" width="160" height="62" rx="3"/>' +
+        '<path class="sv-l2" d="M82 68l78 40 78-40"/>' +
+        '<path class="sv-wr a3a1" style="--len:74" d="M96 88h74"/>' +
+        '<path class="sv-wr a3a2" style="--len:48" d="M96 104h48"/>' +
+        '<rect class="sv-soft" x="192" y="76" width="34" height="24" rx="2"/>' +
+        '<text class="sv-txt" x="196" y="118">54321</text>' + _S; },
+
+      /* 4 우표 */ function(){ return S +
+        '<rect class="sv-fill" x="56" y="42" width="208" height="80" rx="3"/>' +
+        '<path class="sv-l2" d="M58 44l102 50 102-50"/>' +
+        '<path class="sv-l2" d="M76 88h76 M76 102h48"/>' +
+        '<circle class="sv-accl a4r" cx="228" cy="62" r="17"/>' +
+        '<g class="a4s"><rect class="sv-soft" x="210" y="46" width="36" height="32" rx="2"/>' +
+        '<rect class="sv-acc" x="216" y="52" width="24" height="20" rx="1"/></g>' + _S; },
+
+      /* 5 우체통 */ function(){ return S + GROUND +
+        '<rect class="sv-dim" x="212" y="92" width="10" height="38"/>' +
+        '<rect class="sv-acc" x="186" y="36" width="62" height="60" rx="9"/>' +
+        '<rect fill="var(--surface)" x="199" y="50" width="36" height="8" rx="4"/>' +
+        '<g class="a5p">' + walker(170, '<g class="a5e">' + env(178, 88, 24) + '</g>') + '</g>' + _S; },
+
+      /* 6 수거 대기 */ function(){ return S + GROUND +
+        '<g class="a6sun"><circle class="sv-acc" cx="166" cy="32" r="12"/>' +
+        '<path class="sv-accl" d="M166 12v-5 M166 52v5 M146 32h-5 M186 32h5 M152 18l-4-4 M180 46l4 4 M180 18l4-4 M152 46l-4 4"/></g>' +
+        '<g class="a6moon"><path class="sv-acc" d="M174 20a15 15 0 1 0 0 26 18 18 0 0 1 0-26z"/>' +
+        '<circle class="sv-dim" cx="196" cy="18" r="2"/><circle class="sv-dim" cx="146" cy="26" r="1.6"/></g>' +
+        '<rect class="sv-dim" x="90" y="92" width="10" height="38"/>' +
+        '<rect class="sv-acc" x="64" y="56" width="62" height="60" rx="9"/>' +
+        '<rect fill="var(--surface)" x="77" y="70" width="36" height="8" rx="4"/>' +
+        '<circle class="sv-fill" cx="246" cy="74" r="40"/>' +
+        '<path class="sv-l2" d="M246 38v6 M286 74h-6 M246 110v-6 M206 74h6"/>' +
+        '<path class="sv-l a6h" d="M246 74v-18"/>' +
+        '<path class="sv-accl a6m" d="M246 74v-28"/>' +
+        '<circle class="sv-acc" cx="246" cy="74" r="3.5"/>' + _S; },
+
+      /* 7 우체국 접수 */ function(){ return S +
+        '<path class="sv-ground" d="M40 118h240"/>' +
+        '<rect class="sv-fill" x="46" y="96" width="228" height="22" rx="2"/>' +
+        env(84, 78, 54) + env(92, 64, 54) +
+        '<path class="sv-fill" d="M198 96c0-20 10-26 10-32h28c0 6 10 12 10 32z"/>' +
+        '<path class="sv-l2" d="M208 64h28"/>' +
+        '<g class="a7mk"><circle class="sv-accl" cx="119" cy="82" r="13"/><path class="sv-accl" d="M111 82h16"/></g>' +
+        '<g class="a7st"><rect class="sv-acc" x="106" y="48" width="26" height="10" rx="2"/>' +
+        '<rect class="sv-dim" x="115" y="32" width="8" height="18" rx="3"/></g>' + _S; },
+
+      /* 8 집중국 운송 */ function(){ return S +
+        '<path class="sv-ground" d="M0 124h320"/>' +
+        '<path class="sv-dash a8rd" d="M0 134h320"/>' +
+        '<rect class="sv-fill" x="240" y="50" width="70" height="74" rx="2"/>' +
+        '<rect class="sv-soft" x="250" y="62" width="20" height="18"/>' +
+        '<rect class="sv-soft" x="280" y="62" width="20" height="18"/>' +
+        '<text class="sv-txt" x="250" y="104">집중국</text>' +
+        '<g class="a8t"><rect class="sv-fill" x="40" y="70" width="72" height="40" rx="3"/>' +
+        '<path class="sv-l2" d="M52 82h48"/>' +
+        '<path class="sv-acc" d="M112 82h22l16 18v10h-38z"/>' +
+        '<rect fill="var(--surface)" stroke="var(--ink)" stroke-width="2" x="118" y="86" width="16" height="12" rx="1"/>' +
+        '<circle class="sv-fill wheel" cx="62" cy="114" r="10"/>' +
+        '<circle class="sv-fill wheel" cx="134" cy="114" r="10"/></g>' + _S; },
+
+      /* 9 자동 분류 */ function(){ return S +
+        '<path class="sv-dash a9belt" d="M14 100h222"/>' +
+        '<circle class="sv-fill" cx="22" cy="100" r="10"/>' +
+        '<circle class="sv-fill" cx="228" cy="100" r="10"/>' +
+        '<path class="sv-l" d="M120 94V46h64v48"/>' +
+        '<rect class="sv-acc a9scan" x="122" y="56" width="60" height="4" rx="2"/>' +
+        '<text class="sv-txa a9code" x="126" y="38">54321</text>' +
+        '<path class="sv-l2" d="M246 100l50 32 M246 96l50-8"/>' +
+        '<g class="a9e">' + env(96, 76, 26) + '</g>' +
+        '<g class="a9e" style="animation-delay:-1s">' + env(96, 76, 26) + '</g>' +
+        '<g class="a9e" style="animation-delay:-2s">' + env(96, 76, 26) + '</g>' + _S; },
+
+      /* 10 간선 운송 */ function(){ return S +
+        '<circle class="sv-dim a10s" cx="34" cy="24" r="2"/>' +
+        '<circle class="sv-dim a10s" cx="88" cy="14" r="1.6" style="animation-delay:-.8s"/>' +
+        '<circle class="sv-dim a10s" cx="146" cy="28" r="1.8" style="animation-delay:-1.5s"/>' +
+        '<circle class="sv-dim a10s" cx="298" cy="20" r="2" style="animation-delay:-.4s"/>' +
+        '<path class="sv-acc" d="M262 14a14 14 0 1 0 0 26 17 17 0 0 1 0-26z"/>' +
+        '<path class="sv-ground" d="M0 128h320"/>' +
+        '<path class="sv-dash a10rd" d="M0 140h320"/>' +
+        '<g class="a10t"><rect class="sv-fill" x="34" y="54" width="132" height="56" rx="3"/>' +
+        '<path class="sv-l2" d="M48 68h104 M48 84h104"/>' +
+        '<path class="sv-acc" d="M166 66h26l22 22v22h-48z"/>' +
+        '<rect fill="var(--surface)" stroke="var(--ink)" stroke-width="2" x="172" y="70" width="18" height="14" rx="1"/>' +
+        '<path class="sv-accl" d="M218 96h22" opacity=".55"/>' +
+        '<circle class="sv-fill wheel-f" cx="66" cy="116" r="11"/>' +
+        '<circle class="sv-fill wheel-f" cx="102" cy="116" r="11"/>' +
+        '<circle class="sv-fill wheel-f" cx="200" cy="116" r="11"/></g>' + _S; },
+
+      /* 11 순로 분류 */ function(){ return S +
+        '<rect class="sv-fill" x="168" y="24" width="136" height="104" rx="3"/>' +
+        '<path class="sv-l2" d="M202 24v104 M236 24v104 M270 24v104 M168 59h136 M168 94h136"/>' +
+        '<g class="a11f">' + env(176, 32, 20) + '</g>' +
+        '<g class="a11f" style="animation-delay:-2.4s">' + env(244, 67, 20) + '</g>' +
+        '<g class="a11f" style="animation-delay:-4.8s">' + env(210, 102, 20) + '</g>' +
+        '<path class="sv-ground" d="M60 130h84"/>' +
+        env(74, 112, 40) + env(80, 98, 40) +
+        '<g class="a11e">' + env(86, 84, 26) + '</g>' +
+        '<g class="a11e" style="animation-delay:-1.2s">' + env(86, 84, 26) + '</g>' + _S; },
+
+      /* 12 집배원 배달 */ function(){ return S +
+        '<path class="sv-ground" d="M0 130h320"/>' +
+        '<path class="sv-fill" d="M236 130V74l32-24 32 24v56z"/>' +
+        '<rect class="sv-soft" x="256" y="92" width="24" height="26" rx="2"/>' +
+        '<rect class="sv-dim" x="212" y="102" width="7" height="28"/>' +
+        '<rect class="sv-acc" x="196" y="74" width="38" height="28" rx="4"/>' +
+        '<path d="M204 84h22" stroke="var(--surface)" stroke-width="2" stroke-linecap="round" fill="none"/>' +
+        '<g class="a12s"><circle class="sv-fill wheel" cx="82" cy="118" r="11"/>' +
+        '<circle class="sv-fill wheel" cx="142" cy="118" r="11"/>' +
+        '<path class="sv-acc" d="M76 110h58l6-20h-24l-8 10H82z"/>' +
+        '<rect class="sv-soft" x="62" y="80" width="28" height="24" rx="2"/>' +
+        '<circle class="sv-fill" cx="124" cy="60" r="10"/>' +
+        '<path class="sv-l" d="M124 70v16 M124 78l16 4 M124 86l-6 14"/>' +
+        '<g class="a12e">' + env(166, 88, 24) + '</g></g>' + _S; }
+    ],
+
+    digital: [
+      /* 1 앱 열기 */ function(){ return S + screen(76, 18, 168, 116) +
+        '<rect class="d1sc" fill="var(--accent-soft)" x="86" y="30" width="148" height="92" rx="4"/>' +
+        '<g class="d1ui"><path class="sv-l2" d="M98 46h124 M98 62h124 M98 78h84"/>' +
+        '<rect class="sv-acc" x="186" y="94" width="38" height="16" rx="4"/></g>' +
+        '<g class="d1ic"><rect class="sv-acc" x="140" y="58" width="40" height="36" rx="9"/>' +
+        '<path d="M147 67l13 10 13-10" fill="none" stroke="var(--surface)" stroke-width="2.4" stroke-linecap="round"/></g>' + _S; },
+
+      /* 2 주소 입력 */ function(){ return S + screen(40, 22, 240, 108) +
+        '<text class="sv-txt" x="54" y="54">받는 사람</text>' +
+        '<rect class="sv-soft" x="90" y="38" width="174" height="24" rx="3"/>' +
+        '<clipPath id="d2clip"><rect class="d2cl" x="96" y="38" width="152" height="24"/></clipPath>' +
+        '<text class="sv-txa" x="96" y="55" clip-path="url(#d2clip)">chingu@mail.com</text>' +
+        '<rect class="sv-acc d2cr" x="96" y="42" width="2" height="16"/>' +
+        '<g class="d2sg"><rect class="sv-fill" x="90" y="70" width="174" height="46" rx="3"/>' +
+        '<path class="sv-l2" d="M104 86h104 M104 102h66"/>' +
+        '<circle class="sv-acc" cx="246" cy="86" r="4"/></g>' + _S; },
+
+      /* 3 내용 입력 */ function(){ return S + screen(40, 18, 240, 116) +
+        '<path class="sv-l2" d="M40 46h240"/>' +
+        '<text class="sv-txt" x="56" y="38">제목 · 내용</text>' +
+        '<path class="sv-wr d3w1" style="--len:180" d="M60 68h180"/>' +
+        '<path class="sv-wr d3w2" style="--len:180" d="M60 88h180"/>' +
+        '<path class="sv-wr d3w3" style="--len:120" d="M60 108h120"/>' +
+        '<rect class="sv-acc d3cr" x="182" y="100" width="2" height="16"/>' + _S; },
+
+      /* 4 첨부 */ function(){ return S + screen(40, 18, 240, 116) +
+        '<path class="sv-l2" d="M56 38h150"/>' +
+        '<g class="d4c"><rect class="sv-soft" x="58" y="52" width="62" height="52" rx="4"/>' +
+        '<circle class="sv-acc" cx="74" cy="68" r="6"/>' +
+        '<path class="sv-accl" d="M64 96l16-14 12 10 10-8 12 12"/>' +
+        '<text class="sv-txt" x="64" y="120">사진</text></g>' +
+        '<g class="d4c" style="animation-delay:-.2s"><rect class="sv-soft" x="129" y="52" width="62" height="52" rx="4"/>' +
+        '<path class="sv-accl" d="M141 66h38 M141 78h38 M141 90h22"/>' +
+        '<text class="sv-txt" x="135" y="120">문서</text></g>' +
+        '<g class="d4c" style="animation-delay:-.4s"><rect class="sv-soft" x="200" y="52" width="62" height="52" rx="4"/>' +
+        '<path class="sv-acc" d="M221 66l22 12-22 12z"/>' +
+        '<text class="sv-txt" x="203" y="120">동영상</text></g>' + _S; },
+
+      /* 5 보내기 */ function(){ return S + screen(40, 18, 240, 116) +
+        '<path class="sv-l2" d="M60 42h160 M60 58h160 M60 74h96"/>' +
+        '<circle class="sv-accl d5r" cx="206" cy="104" r="15"/>' +
+        '<g class="d5btn"><rect class="sv-acc" x="166" y="92" width="80" height="26" rx="6"/>' +
+        '<text x="182" y="109" fill="var(--surface)" font-size="12" font-weight="600">보내기</text></g>' +
+        '<g class="d5cur"><path fill="var(--ink)" stroke="var(--surface)" stroke-width="1.5" ' +
+        'd="M208 98v23l5-6 4 9 5-2-4-8 7-1z"/></g>' + _S; },
+
+      /* 6 메일 서버 */ function(){ return S +
+        '<rect class="sv-fill" x="18" y="56" width="62" height="46" rx="4"/>' +
+        '<path class="sv-l" d="M32 102h34"/>' +
+        '<text class="sv-txt" x="22" y="122">내 기기</text>' +
+        '<path class="sv-dash wire" d="M84 78h150"/>' +
+        '<rect class="sv-fill" x="238" y="34" width="64" height="88" rx="4"/>' +
+        '<rect class="sv-soft" x="246" y="44" width="48" height="16" rx="2"/>' +
+        '<rect class="sv-soft" x="246" y="68" width="48" height="16" rx="2"/>' +
+        '<rect class="sv-soft" x="246" y="92" width="48" height="16" rx="2"/>' +
+        '<text class="sv-txt" x="238" y="140">메일 서버</text>' +
+        '<g class="d6p">' + env(86, 68, 22) + '</g>' + _S; },
+
+      /* 7 주소 조회 */ function(){ return S +
+        '<rect class="sv-fill" x="18" y="50" width="62" height="48" rx="4"/>' +
+        '<text class="sv-txt" x="20" y="118">메일 서버</text>' +
+        '<path class="sv-dash wire" d="M84 74h140"/>' +
+        '<rect class="sv-fill" x="228" y="40" width="74" height="68" rx="4"/>' +
+        '<path class="sv-l2" d="M240 60h50 M240 74h50 M240 88h30"/>' +
+        '<text class="sv-txt" x="228" y="128">주소 안내</text>' +
+        '<g class="d7q"><circle class="sv-acc" cx="98" cy="74" r="12"/>' +
+        '<text x="94" y="79" fill="var(--surface)" font-size="14" font-weight="700">?</text></g>' +
+        '<g class="d7a"><rect class="sv-soft" x="84" y="63" width="34" height="22" rx="3"/>' +
+        '<text class="sv-txa" x="90" y="78">IP</text></g>' + _S; },
+
+      /* 8 인터넷 망 */ function(){ return S +
+        '<path class="sv-dash" d="M40 96h240"/>' +
+        '<circle class="sv-fill d8n" cx="40" cy="96" r="12"/>' +
+        '<circle class="sv-fill d8n" cx="98" cy="96" r="12" style="animation-delay:.5s"/>' +
+        '<circle class="sv-fill d8n" cx="156" cy="96" r="12" style="animation-delay:1s"/>' +
+        '<circle class="sv-fill d8n" cx="214" cy="96" r="12" style="animation-delay:1.5s"/>' +
+        '<circle class="sv-fill d8n" cx="272" cy="96" r="12"/>' +
+        '<text class="sv-txt" x="40" y="130">라우터를 건너뛰며 이동한다</text>' +
+        '<g class="d8p"><g class="d8b">' + env(29, 60, 22) + '</g></g>' + _S; },
+
+      /* 9 받은편지함 */ function(){ return S +
+        '<rect class="sv-fill" x="102" y="14" width="116" height="126" rx="12"/>' +
+        '<rect fill="var(--accent-soft)" x="110" y="28" width="100" height="98" rx="4"/>' +
+        '<text class="sv-txt" x="120" y="46">받은편지함</text>' +
+        '<path class="sv-l2" d="M122 112h76"/>' +
+        '<g class="d9e"><rect class="sv-fill" x="122" y="58" width="76" height="42" rx="3"/>' +
+        '<path class="sv-l2" d="M124 60l36 24 36-24"/></g>' +
+        '<circle class="sv-accl d9r" cx="206" cy="32" r="15"/>' +
+        '<g class="d9b"><circle class="sv-acc" cx="206" cy="32" r="11"/>' +
+        '<text x="203" y="37" fill="var(--surface)" font-size="12" font-weight="700">1</text></g>' + _S; }
+    ]
+  };
+
+  function sceneFor(L, i){
+    var list = SCENES[L.key];
+    var f = list && list[Math.max(0, Math.min(i, list.length - 1))];
+    return f ? f() : '';
+  }
+
+  /* ── build DOM ───────────────────────────────────────── */
+  var lanesEl = document.getElementById('lanes');
+
+  LANES.forEach(function(L){
+    var n = L.steps.length;
+
+    var sec = document.createElement('section');
+    sec.className = 'lane ' + L.cls;
+    sec.setAttribute('aria-label', L.title + ' 진행 상황');
+
+    var stationsHTML = L.steps.map(function(s, i){
+      return '<li class="station" data-i="' + i + '">' +
+               '<span class="station__dot" aria-hidden="true">' + s.icon + '</span>' +
+               '<span class="station__label">' + s.label + '</span>' +
+             '</li>';
+    }).join('') +
+      '<li class="station station--end" data-i="' + n + '">' +
+        '<span class="station__dot" aria-hidden="true">' + L.endIcon + '</span>' +
+        '<span class="station__label">' + L.endLabel + '</span>' +
+      '</li>';
+
+    var stampHTML = L.key === 'analog'
+      ? '<div class="stamp stamp--post" aria-hidden="true">도착<span id="stampA">—</span></div>'
+      : '<div class="stamp stamp--net" aria-hidden="true">📥 받은편지함 도착 · <b id="stampD">—</b></div>';
+
+    sec.innerHTML =
+      stampHTML +
+      '<div class="lane__head">' +
+        '<div class="lane__id">' +
+          '<span class="lane__badge">' + L.badge + '</span>' +
+          '<h2 class="lane__title">' + L.title + '</h2>' +
+          '<span class="lane__means">' + L.means + '</span>' +
+        '</div>' +
+        '<div class="lane__clock">' +
+          '<div class="clock" data-clock>0<span class="u">' + (L.fmt==='long'?'분':'초') + '</span></div>' +
+          '<div class="clock-label">지금까지 흐른 시간</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="track">' +
+        '<div class="rail-area">' +
+          '<div class="rail"><div class="rail__fill" data-fill></div></div>' +
+          '<div class="streak" data-streak></div>' +
+          (L.key==='analog'
+            ? '<div class="marker" data-marker><span class="marker__flag">전자 우편은 여기서 이미 도착</span><span class="marker__stem"></span></div>'
+            : '') +
+          '<div class="token" data-token aria-hidden="true">' + L.token + '</div>' +
+          '<ol class="stations" data-stations>' + stationsHTML + '</ol>' +
+        '</div>' +
+      '</div>' +
+      '<div class="now" data-now>' +
+        '<div class="stage" data-stage>' + sceneFor(L, 0) + '</div>' +
+        '<div class="now__body">' +
+          '<div class="now__meta">' +
+            '<span class="now__step" data-now-step>단계 1 / ' + n + '</span>' +
+            '<span class="chip" data-now-chip>' + L.meChip + '</span>' +
+          '</div>' +
+          '<h3 class="now__name" data-now-name>' + L.steps[0].name + '</h3>' +
+          '<p class="now__desc" data-now-desc>' + L.steps[0].desc + '</p>' +
+        '</div>' +
+        '<div class="now__dur" data-now-dur>' + durText(L.steps[0].real) + '<small>이 단계</small></div>' +
+      '</div>' +
+      (L.key==='digital'
+        ? '<div class="waiting" data-waiting>전자 우편은 이미 도착했습니다. 종이 편지는 아직 가는 중입니다. 지금까지 흐른 시간이면 전자 우편을 <b data-count>0</b>통 보낼 수 있었습니다.</div>'
+        : '');
+
+    lanesEl.appendChild(sec);
+
+    L.el = {
+      root: sec,
+      clock: sec.querySelector('[data-clock]'),
+      fill: sec.querySelector('[data-fill]'),
+      token: sec.querySelector('[data-token]'),
+      streak: sec.querySelector('[data-streak]'),
+      marker: sec.querySelector('[data-marker]'),
+      stations: sec.querySelector('[data-stations]'),
+      nodes: [].slice.call(sec.querySelectorAll('.station')),
+      stage: sec.querySelector('[data-stage]'),
+      nowStep: sec.querySelector('[data-now-step]'),
+      nowChip: sec.querySelector('[data-now-chip]'),
+      nowName: sec.querySelector('[data-now-name]'),
+      nowDesc: sec.querySelector('[data-now-desc]'),
+      nowDur:  sec.querySelector('[data-now-dur]'),
+      stamp: sec.querySelector('.stamp'),
+      stampVal: sec.querySelector(L.key==='analog' ? '#stampA' : '#stampD'),
+      waiting: sec.querySelector('[data-waiting]'),
+      count: sec.querySelector('[data-count]')
+    };
+  });
+
+  /* facts + scoreboard refs */
+  var factsEl   = document.getElementById('facts');
+  var barA = document.getElementById('barA'), barAv = document.getElementById('barAv');
+  var barD = document.getElementById('barD'), barDv = document.getElementById('barDv');
+  var boardNote = document.getElementById('boardNote');
+  var verdict1 = document.getElementById('verdict1');
+  var verdict2 = document.getElementById('verdict2');
+
+  var ratioAll  = A.totalReal / D.totalReal;
+  var ratioSend = A.sysReal / D.sysReal;
+  var pctAtD    = (D.totalReal / A.totalReal) * 100;
+  var mailCount = Math.floor(A.totalReal / D.totalReal);
+
+  var FACTS = [
+    { num:'약 ' + comma(ratioAll) + '배',
+      label:'전 과정에 걸린 시간 차이',
+      sub:'편지지를 사러 나가는 순간부터 상대가 받기까지, 종이 편지가 ' + comma(ratioAll) + '배 더 오래 걸립니다.' },
+    { num:'약 ' + comma(Math.round(ratioSend/1000)*1000) + '배',
+      label:'손을 떠난 뒤 전달되는 시간 차이',
+      sub:'우체통에 넣은 뒤 ' + plainTime(A.sysReal,'long') + ', 보내기를 누른 뒤 ' + D.sysReal.toFixed(2) + '초.' },
+    { num:pctAtD.toFixed(2) + '%',
+      label:'전자 우편이 도착한 순간, 종이 편지가 지나온 거리',
+      sub:'전자 우편이 전부 끝난 시점에 종이 편지는 아직 문구점에 가는 길이었습니다.' }
+  ];
+
+  factsEl.innerHTML = FACTS.map(function(f){
+    return '<div class="fact is-hidden">' +
+             '<span class="fact__num">?</span>' +
+             '<span class="fact__label">' + f.label + '</span>' +
+             '<span class="fact__sub">두 편지가 모두 도착하면 채워집니다.</span>' +
+           '</div>';
+  }).join('');
+
+  function revealFacts(on){
+    var tiles = factsEl.querySelectorAll('.fact');
+    for(var i=0;i<tiles.length;i++){
+      tiles[i].classList.toggle('is-hidden', !on);
+      tiles[i].querySelector('.fact__num').textContent = on ? FACTS[i].num : '?';
+      tiles[i].querySelector('.fact__sub').textContent = on ? FACTS[i].sub : '두 편지가 모두 도착하면 채워집니다.';
+    }
+  }
+
+  /* ── state ───────────────────────────────────────────── */
+  var st = { playing:false, mode:'observe', speed:1, last:0, raf:0 };
+  var run = {};
+  LANES.forEach(function(L){ run[L.key] = { t:0, i:0, p:0, done:false, lastIdx:-1, flashed:false }; });
+
+  function simDur(L, i){
+    return st.mode === 'observe' ? L.steps[i].obs : Math.max(L.steps[i].real * REAL_SCALE, 0.0004);
+  }
+  function simTotal(L){
+    var t = 0; for(var i=0;i<L.steps.length;i++) t += simDur(L,i); return t;
+  }
+
+  /* ── render ──────────────────────────────────────────── */
+  function renderLane(L){
+    var r = run[L.key], e = L.el, n = L.steps.length;
+    var i = r.i, p = r.p;
+
+    // clock: real elapsed seconds
+    var elapsed = 0;
+    for(var k=0;k<i;k++) elapsed += L.steps[k].real;
+    if(i < n) elapsed += L.steps[i].real * p;
+    if(r.done) elapsed = L.totalReal;
+    e.clock.innerHTML = clockHTML(elapsed, L.fmt);
+    r.elapsed = elapsed;
+
+    // position across n+1 nodes
+    var frac = r.done ? (n + 0.5)/(n+1) : (i + p + 0.5)/(n+1);
+    e.fill.style.width = (frac*100) + '%';
+    e.token.style.left = (frac*100) + '%';
+
+    // stations
+    var activeIdx = r.done ? n : i;
+    for(var s=0;s<e.nodes.length;s++){
+      var node = e.nodes[s];
+      node.classList.toggle('is-done', s < activeIdx || (r.done && s === n));
+      node.classList.toggle('is-active', s === activeIdx && !r.done);
+    }
+
+    // now card
+    if(!r.done){
+      var step = L.steps[i];
+      if(r.lastIdx !== i){
+        e.stage.innerHTML = sceneFor(L, i);
+        e.nowStep.textContent = '단계 ' + (i+1) + ' / ' + n;
+        e.nowChip.textContent = step.who === 'sys' ? L.sysChip : L.meChip;
+        e.nowChip.classList.toggle('chip--sys', step.who === 'sys');
+        e.nowName.textContent = step.name;
+        e.nowDesc.textContent = step.desc;
+        e.nowDur.innerHTML = durText(step.real) + '<small>이 단계</small>';
+        scrollTo(e, activeIdx);
+        r.lastIdx = i;
+      }
+    } else if(r.lastIdx !== n){
+      e.stage.innerHTML = sceneFor(L, n - 1);
+      e.nowStep.textContent = '완료 · ' + n + '단계';
+      e.nowChip.textContent = '도착';
+      e.nowChip.classList.add('chip--sys');
+      e.nowName.textContent = L.endLabel;
+      e.nowDesc.textContent = L.key === 'analog'
+        ? '편지지를 사러 나선 때로부터 ' + plainTime(L.totalReal,'long') + ' 만에 상대의 우편함에 들어갔습니다.'
+        : '메일 앱을 연 때로부터 ' + plainTime(L.totalReal,'short') + ' 만에 상대의 받은편지함에 들어갔습니다.';
+      e.nowDur.innerHTML = plainTime(L.totalReal, L.fmt) + '<small>전 과정</small>';
+      e.stampVal.textContent = plainTime(L.totalReal, L.fmt);
+      e.stamp.classList.add('show');
+      scrollTo(e, n);
+      r.lastIdx = n;
+      onFinish(L);
+    }
+  }
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function scrollTo(e, idx){
+    var node = e.nodes[idx];
+    if(!node) return;
+    if(e.stations.scrollWidth <= e.stations.clientWidth + 2) return;
+    var target = node.offsetLeft - (e.stations.clientWidth - node.offsetWidth)/2;
+    e.stations.scrollTo({ left: Math.max(0,target), behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  /* ── finishing ───────────────────────────────────────── */
+  function onFinish(L){
+    if(L.key === 'digital'){
+      A.el.marker.style.left = ((0 + (D.totalReal/A.steps[0].real) + 0.5)/(A.steps.length+1))*100 + '%';
+      A.el.marker.classList.add('show');
+      if(!run.analog.done) D.el.waiting.classList.add('show');
+    }
+    updateBoard();
+  }
+
+  function updateBoard(){
+    var ad = run.analog.done, dd = run.digital.done;
+    if(dd){
+      barD.style.minWidth = '3px';
+      barD.style.width = Math.max((D.totalReal / A.totalReal) * 100, 0.35) + '%';
+      barDv.innerHTML = plainTime(D.totalReal,'short') + '<em>막대는 보이도록 실제보다 굵게 그렸습니다</em>';
+    }
+    if(ad){
+      barA.style.width = '100%';
+      barAv.innerHTML = plainTime(A.totalReal,'long');
+      D.el.waiting.classList.remove('show');
+    }
+    if(ad && dd){
+      revealFacts(true);
+      boardNote.textContent = '두 편지 모두 도착했습니다.';
+      verdict1.innerHTML =
+        '같은 내용을 보내는 데 종이 편지는 <b>' + plainTime(A.totalReal,'long') + '</b>, 전자 우편은 <b>' +
+        plainTime(D.totalReal,'short') + '</b>이 걸렸습니다. 종이 편지가 쓴 시간의 대부분(' +
+        plainTime(A.sysReal,'long') + ')은 <b>기다림과 옮김</b>이었습니다. 수거를 기다리고, 트럭에 실려 가고, 다시 분류되기를 반복하는 동안 편지는 아무것도 하지 않고 그저 이동했습니다.';
+      verdict2.hidden = false;
+      verdict2.innerHTML =
+        '전자 우편에는 그 단계가 통째로 없습니다. 사람이 옮길 물건이 아니라 <b>데이터</b>이기 때문입니다. 그래서 시간과 비용이 줄었고, ' +
+        '거기에 더해 <b>글자 말고도 사진·문서·동영상</b>을 같이 보낼 수 있게 되었습니다. 종이 편지 한 통이 가는 동안 전자 우편은 약 ' +
+        comma(mailCount) + '통을 보낼 수 있습니다.';
+    } else if(ad || dd){
+      boardNote.textContent = dd && !ad ? '전자 우편 도착. 종이 편지는 아직 가는 중입니다.' : '종이 편지 도착.';
+    }
+  }
+
+  /* ── loop ────────────────────────────────────────────── */
+  function advance(L, dt){
+    var r = run[L.key];
+    if(r.done) return;
+    r.t += dt;
+    var acc = 0;
+    for(var i=0;i<L.steps.length;i++){
+      var d = simDur(L,i);
+      if(r.t < acc + d){ r.i = i; r.p = (r.t - acc)/d; return; }
+      acc += d;
+    }
+    r.i = L.steps.length - 1; r.p = 1; r.done = true;
+  }
+
+  function frame(ts){
+    if(!st.playing){ st.raf = 0; return; }
+    if(!st.last) st.last = ts;
+    var dt = Math.min((ts - st.last)/1000, 0.1) * st.speed;
+    st.last = ts;
+
+    LANES.forEach(function(L){ advance(L, dt); renderLane(L); });
+
+    // waiting counter while analog still travels
+    if(run.digital.done && !run.analog.done){
+      D.el.count.textContent = comma(Math.floor(run.analog.elapsed / D.totalReal));
+    }
+
+    if(run.analog.done && run.digital.done){ setPlaying(false); }
+    else st.raf = requestAnimationFrame(frame);
+  }
+
+  /* ── controls ────────────────────────────────────────── */
+  var playBtn = document.getElementById('play');
+
+  function setPlaying(v){
+    st.playing = v;
+    playBtn.textContent = v ? '⏸ 멈춤' : (started() ? '▶ 이어서' : '▶ 동시에 출발');
+    if(v){
+      LANES.forEach(function(L){ L.el.root.classList.add('is-running'); });
+      st.last = 0;
+      if(!st.raf) st.raf = requestAnimationFrame(frame);
+      maybeFlash();
+    } else {
+      LANES.forEach(function(L){ L.el.root.classList.remove('is-running'); });
+      if(st.raf){ cancelAnimationFrame(st.raf); st.raf = 0; }
+    }
+  }
+  function started(){ return run.analog.t > 0 || run.digital.t > 0; }
+
+  function maybeFlash(){
+    // In 실제 비율 모드 the digital lane finishes faster than one frame — show a streak so it is visible.
+    if(st.mode !== 'real' || run.digital.flashed || run.digital.done) return;
+    run.digital.flashed = true;
+    var s = D.el.streak;
+    s.classList.remove('fire'); void s.offsetWidth; s.classList.add('fire');
+  }
+
+  playBtn.addEventListener('click', function(){
+    if(run.analog.done && run.digital.done){ reset(); return; }
+    setPlaying(!st.playing);
+  });
+
+  document.getElementById('step').addEventListener('click', function(){
+    setPlaying(false);
+    LANES.forEach(function(L){
+      var r = run[L.key];
+      if(r.done) return;
+      var acc = 0;
+      for(var i=0;i<=r.i;i++) acc += simDur(L,i);
+      r.t = acc + 0.0001;
+      advance(L, 0);
+      renderLane(L);
+    });
+    playBtn.textContent = started() ? '▶ 이어서' : '▶ 동시에 출발';
+  });
+
+  function reset(){
+    setPlaying(false);
+    LANES.forEach(function(L){
+      var r = run[L.key];
+      r.t = 0; r.i = 0; r.p = 0; r.done = false; r.lastIdx = -1; r.flashed = false; r.elapsed = 0;
+      L.el.stamp.classList.remove('show');
+      L.el.root.classList.remove('is-running');
+      if(L.el.marker) L.el.marker.classList.remove('show');
+      if(L.el.waiting) L.el.waiting.classList.remove('show');
+      renderLane(L);
+    });
+    barA.style.width = '0'; barAv.innerHTML = '';
+    barD.style.width = '0'; barD.style.minWidth = '0'; barDv.innerHTML = '';
+    revealFacts(false);
+    boardNote.textContent = '출발하면 두 편지의 기록이 여기 쌓입니다.';
+    verdict1.textContent = '두 편지가 모두 도착하면 여기에 결론이 나타납니다.';
+    verdict2.hidden = true;
+    playBtn.textContent = '▶ 동시에 출발';
+  }
+  document.getElementById('reset').addEventListener('click', reset);
+
+  document.getElementById('mode').addEventListener('click', function(ev){
+    var b = ev.target.closest('button[data-mode]'); if(!b) return;
+    [].forEach.call(this.querySelectorAll('button'), function(x){
+      x.setAttribute('aria-pressed', String(x === b));
+    });
+    st.mode = b.dataset.mode;
+    reset();
+  });
+
+  document.getElementById('speed').addEventListener('click', function(ev){
+    var b = ev.target.closest('button[data-speed]'); if(!b) return;
+    [].forEach.call(this.querySelectorAll('button'), function(x){
+      x.setAttribute('aria-pressed', String(x === b));
+    });
+    st.speed = Number(b.dataset.speed);
+  });
+
+  // click a station to inspect that step
+  LANES.forEach(function(L){
+    L.el.stations.addEventListener('click', function(ev){
+      var li = ev.target.closest('.station'); if(!li) return;
+      var idx = Number(li.dataset.i);
+      if(idx >= L.steps.length) return;
+      setPlaying(false);
+      var r = run[L.key], acc = 0;
+      for(var i=0;i<idx;i++) acc += simDur(L,i);
+      r.t = acc + 0.0001; r.done = false;
+      r.lastIdx = -1;                       // force the scene to replay from the start
+      L.el.stamp.classList.remove('show');
+      advance(L, 0); renderLane(L);
+    });
+  });
+
+  LANES.forEach(renderLane);
+})();
+</script>
+
+</body></html>

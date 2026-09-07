@@ -1,0 +1,20 @@
+{
+  "name": "postal-simulator",
+  "private": true,
+  "version": "1.0.0",
+  "description": "우체통에서 받은편지함까지 — 종이 편지와 전자 우편이 거치는 경로와 걸리는 시간을 나란히 비교하는 수업용 시뮬레이션 (중학교 정보 2단원 데이터)",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite"
+  },
+  "keywords": [
+    "education",
+    "middle-school",
+    "informatics",
+    "data"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^8.1.5"
+  }
+}
