@@ -277,7 +277,7 @@ h1{
 .chip--sys{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
 .now__step{font-size:11.5px;font-weight:600;letter-spacing:.08em;color:var(--ink-3);font-family:var(--f-mono)}
 .now__name{margin:0;font-size:17.5px;font-weight:600;letter-spacing:-.01em;line-height:1.35;word-break:keep-all}
-.now__desc{margin:0;font-size:14.5px;color:var(--ink-2);word-break:keep-all;max-width:62ch}
+.now__desc{margin:0;font-size:14.5px;color:var(--ink-2);word-break:keep-all}
 .now__dur{
   flex:none;text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;
   font-size:19px;font-weight:600;color:var(--accent);padding-left:8px;
@@ -378,6 +378,11 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
 }
 .q p{margin:0;font-size:14.5px;color:var(--ink-2);word-break:keep-all}
 .q b{color:var(--em);font-weight:600}
+/* 5번은 앞의 네 질문을 하나로 묶는 정리 질문이라 한 줄을 통째로 쓴다.
+   패들렛 카드와 같은 강조색을 둘러 「여기까지가 오늘의 답」임을 보이게 했다. */
+.q--sum{grid-column:1/-1;border-color:var(--em);border-left:4px solid var(--em)}
+.q--sum .q__n{background:var(--em);color:var(--paper)}
+.q--sum p{color:var(--ink)}
 
 /* ── 패들렛으로 제출 ────────────────────────────────────── */
 .padlet{
@@ -403,6 +408,13 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
    새 묶음이 시작되는 줄에 붙여 위와 한 칸 띄운다 (예전의 <br> 자리). */
 .colophon > span{display:block}
 .colophon > span.colophon__group{margin-top:10px}
+
+/* 한 줄에 한 문장씩 — 페이지 안의 나머지 설명 문단에도 같은 규칙을 적용한다.
+   단계 설명·생각해 보기 질문·기다림 안내·제출 안내가 여기에 해당한다. */
+.now__desc > span,
+.q p > span,
+.waiting > span,
+.padlet__desc > span{display:block}
 
 /* ── scenes ─────────────────────────────────────────────── */
 .stage{
@@ -704,10 +716,11 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
   <section class="think" aria-labelledby="think-title">
     <h2 id="think-title">생각해 보기</h2>
     <ol class="qs">
-      <li class="q"><span class="q__n">1</span><p>종이 편지의 12단계 중 전자 우편에는 <b>아예 없는 단계</b>는 몇 개인가요? 그 단계들은 왜 사라졌을까요?</p></li>
-      <li class="q"><span class="q__n">2</span><p>전자 우편이 빠른 이유가 &lsquo;기계가 빨라서&rsquo;뿐일까요? 사람이 직접 하던 일 중 무엇이 없어졌는지 짚어 보세요.</p></li>
-      <li class="q"><span class="q__n">3</span><p>편지 말고도 예전엔 아날로그였지만 지금은 디지털로 바뀐 것을 두 가지 더 찾아보세요. 사진, 지도, 음악, 시계, 책&hellip;</p></li>
-      <li class="q"><span class="q__n">4</span><p>빨라진 대신 <b>잃은 것</b>은 없을까요? 손으로 쓴 편지에만 남아 있는 가치는 무엇일까요?</p></li>
+      <li class="q"><span class="q__n">1</span><p><span>종이 편지의 12단계 중 전자 우편에는 <b>아예 없는 단계</b>는 몇 개인가요?</span><span>그 단계들은 왜 사라졌을까요?</span></p></li>
+      <li class="q"><span class="q__n">2</span><p><span>전자 우편이 빠른 이유가 &lsquo;기계가 빨라서&rsquo;뿐일까요?</span><span>사람이 직접 하던 일 중 무엇이 없어졌는지 짚어 보세요.</span></p></li>
+      <li class="q"><span class="q__n">3</span><p><span>편지 말고도 예전엔 아날로그였지만 지금은 디지털로 바뀐 것을 두 가지 더 찾아보세요.</span><span>사진, 지도, 음악, 시계, 책&hellip;</span></p></li>
+      <li class="q"><span class="q__n">4</span><p><span>빨라진 대신 <b>잃은 것</b>은 없을까요?</span><span>손으로 쓴 편지에만 남아 있는 가치는 무엇일까요?</span></p></li>
+      <li class="q q--sum"><span class="q__n">5</span><p><span><b>디지털 사용으로 얻을 수 있는 가치</b>는 무엇인가요?</span><span>위 「걸린 시간 비교」에 나온 숫자를 근거로 삼아, ① 걸리는 시간 ② 드는 비용과 사람의 수고 ③ 보낼 수 있는 데이터의 종류 — 이 세 가지를 모두 넣어 한 문장으로 정리해 보세요.</span></p></li>
     </ol>
 
     <!-- 생각을 적어 내는 곳. 이 앱은 아무것도 저장하지 않고 패들렛으로 보내기만 한다. -->
@@ -716,7 +729,7 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
       <span class="padlet__icon" aria-hidden="true">📝</span>
       <span class="padlet__body">
         <span class="padlet__title">패들렛에 내 생각 올리기</span>
-        <span class="padlet__desc">위 네 질문에 대한 내 생각을 패들렛에 적어 제출해요. 새 창으로 열립니다.</span>
+        <span class="padlet__desc"><span>위 다섯 질문에 대한 내 생각을 패들렛에 적어 제출해요.</span><span>새 창으로 열립니다.</span></span>
       </span>
       <span class="padlet__go">패들렛 열기 →</span>
     </a>
@@ -842,6 +855,24 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
     return clockHTML(sec, kind).replace(/<span class="u">/g,' ').replace(/<\/span>/g,'');
   }
   function comma(n){ return Math.round(n).toLocaleString('ko-KR'); }
+
+  // 설명 문단은 한 줄에 한 문장씩 — 문장마다 <span> 으로 감싸고 CSS 가 블록으로 만든다.
+  // 마침표가 숫자 사이에 있으면(0.88초) 문장 끝으로 보지 않는다.
+  function esc(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function lines(text){
+    var s = String(text), out = [], start = 0, i, c, prev, next;
+    for(i = 0; i < s.length; i++){
+      c = s.charAt(i);
+      if(c !== '.' && c !== '?' && c !== '!') continue;
+      prev = s.charAt(i-1); next = s.charAt(i+1);
+      if(c === '.' && prev >= '0' && prev <= '9' && next >= '0' && next <= '9') continue;
+      if(next !== '' && next !== ' ') continue;
+      out.push(s.slice(start, i+1)); start = i + 1;
+    }
+    out.push(s.slice(start));
+    return out.map(function(t){ return t.trim(); }).filter(Boolean)
+              .map(function(t){ return '<span>' + esc(t) + '</span>'; }).join('');
+  }
 
   /* ── scenes ──────────────────────────────────────────────
      One small stage per step, drawn as inline SVG. Every scene is authored so
@@ -1164,7 +1195,11 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
         '<div class="now__dur" data-now-dur>' + durText(L.steps[0].real) + '<small>이 단계</small></div>' +
       '</div>' +
       (L.key==='digital'
-        ? '<div class="waiting" data-waiting>전자 우편은 이미 도착했습니다. 종이 편지는 아직 가는 중입니다. 지금까지 흐른 시간이면 전자 우편을 <b data-count>0</b>통 보낼 수 있었습니다.</div>'
+        ? '<div class="waiting" data-waiting>' +
+            '<span>전자 우편은 이미 도착했습니다.</span>' +
+            '<span>종이 편지는 아직 가는 중입니다.</span>' +
+            '<span>지금까지 흐른 시간이면 전자 우편을 <b data-count>0</b>통 보낼 수 있었습니다.</span>' +
+          '</div>'
         : '');
 
     lanesEl.appendChild(sec);
@@ -1280,7 +1315,7 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
         e.nowChip.textContent = step.who === 'sys' ? L.sysChip : L.meChip;
         e.nowChip.classList.toggle('chip--sys', step.who === 'sys');
         e.nowName.textContent = step.name;
-        e.nowDesc.textContent = step.desc;
+        e.nowDesc.innerHTML = lines(step.desc);
         e.nowDur.innerHTML = durText(step.real) + '<small>이 단계</small>';
         scrollTo(e, activeIdx);
         r.lastIdx = i;
@@ -1291,9 +1326,9 @@ h2{margin:0;font-size:25px;font-weight:700;letter-spacing:-.015em}
       e.nowChip.textContent = '도착';
       e.nowChip.classList.add('chip--sys');
       e.nowName.textContent = L.endLabel;
-      e.nowDesc.textContent = L.key === 'analog'
+      e.nowDesc.innerHTML = lines(L.key === 'analog'
         ? '편지지를 사러 나선 때로부터 ' + plainTime(L.totalReal,'long') + ' 만에 상대의 우편함에 들어갔습니다.'
-        : '메일 앱을 연 때로부터 ' + plainTime(L.totalReal,'short') + ' 만에 상대의 받은편지함에 들어갔습니다.';
+        : '메일 앱을 연 때로부터 ' + plainTime(L.totalReal,'short') + ' 만에 상대의 받은편지함에 들어갔습니다.');
       e.nowDur.innerHTML = plainTime(L.totalReal, L.fmt) + '<small>전 과정</small>';
       e.stampVal.textContent = plainTime(L.totalReal, L.fmt);
       e.stamp.classList.add('show');
