@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Nanum+Pen+Script&display=swap">
 <style>
 /* 브라우저 기본값 정리 — 아래 본문 style 이 실제 꾸미기를 맡는다 */
-:root{color-scheme:light dark}
+:root{color-scheme:light}
 body{margin:0;padding:0;background:#faf9f5;color:#141413}
 img{max-width:100%}
 [hidden]:not([hidden=until-found]){display:none!important}
@@ -49,45 +49,12 @@ img{max-width:100%}
   --r-s:6px; --r-m:10px; --r-l:16px;
   --shadow:0 1px 2px rgba(40,32,18,.06),0 8px 24px -14px rgba(40,32,18,.28);
 }
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --paper:#15171B;
-    --surface:#1D2026;
-    --surface-2:#252932;
-    --ink:#ECE7DE;
-    --ink-2:#B2AAA0;
-    --ink-3:#847D73;
-    --line:#31353D;
-    --line-2:#414751;
-
-    --post:#FF7360;
-    --post-soft:#3A2320;
-    --kraft:#D9B67F;
-    --net:#74AAFF;
-    --net-soft:#17263D;
-    --signal:#2FD9C0;
-    --em:#2FD9C0;
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -16px rgba(0,0,0,.8);
-  }
-}
-:root[data-theme="dark"]{
-  --paper:#15171B;
-  --surface:#1D2026;
-  --surface-2:#252932;
-  --ink:#ECE7DE;
-  --ink-2:#B2AAA0;
-  --ink-3:#847D73;
-  --line:#31353D;
-  --line-2:#414751;
-  --post:#FF7360;
-  --post-soft:#3A2320;
-  --kraft:#D9B67F;
-  --net:#74AAFF;
-  --net-soft:#17263D;
-  --signal:#2FD9C0;
-  --em:#2FD9C0;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -16px rgba(0,0,0,.8);
-}
+/* 보는 사람의 브라우저·운영체제 테마와 상관없이 **항상 밝게** 보인다.
+   어두운 테마용 토큰 블록을 두지 않고, color-scheme 도 light 로 못박는다.
+   아티팩트처럼 바깥 틀이 :root 에 data-theme 을 찍는 곳에서도 이 규칙이 이긴다. */
+:root,
+:root[data-theme="dark"],
+:root[data-theme="light"]{color-scheme:light}
 
 *,*::before,*::after{box-sizing:border-box}
 body{
